@@ -39,8 +39,8 @@ struct statistics_t {
 	unsigned long int cacheSize; 	// cache size in bytes
 	unsigned long int lineSize;		// line size in bytes
 	unsigned long int associativity;// cache degree of associativity
-	unsigned long int numSets; 		// number of sets in the cache (might be redundant)
-	unsigned long int numLines		// number of lines in the cache (might be redundant)
+	unsigned long int numSets; 		// number of sets in the cache 
+	unsigned long int numLines		// number of lines in the cache 
 } cacheStatistics;
 
 
@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
 	/* Read command line arguments and do error check
 	   ----------------------------------------------
 		Argv[0] = executable
-	 	Argv[1] = cache size in bytes (store in cacheStatistics.cacheSize)
+	 	Argv[1] = number of sets (store in cacheStatistics.numSets)
 	 	Argv[2] = line size in bytes (store in cacheStatistics.lineSize)
 	 	Argv[3] = cache associativity (store in cacheStatistics.associativity)
 	 	Argv[4] = trace file name (store in filename)
@@ -97,7 +97,7 @@ int main(int argc, char * argv[])
 	*/
 	if(argc != 6)
 	{
-		fprintf(stderr, "Usage: %s argument\n", argv[0]);
+		fprintf(stderr, "Usage: %s	#Sets	Line size in bytes	Associativity	Trace file name		Debug flag\n", argv[0]);
 		return 1;
 	}
 	
@@ -110,15 +110,15 @@ int main(int argc, char * argv[])
 	filename = argv[4];
     debugFlag = atoi(argv[5]);
     
-    cacheStatistics.cacheSize = (unsigned long int)arg1;
+    cacheStatistics.numSets = (unsigned long int)arg1;
     cacheStatistics.lineSize = (unsigned long int)arg2;
     cacheStatistics.associativity = (unsigned long int)arg3;
     
 
     // Compute and initialize all other cache attributes
-	cacheStatistics.numLines = cacheStatistics.cacheSize / cacheStatistics.lineSize;	
-	cacheStatistics.numSets = cacheStatistics.numLines / cacheStatistics.associativity; 	
-    
+    cacheStatistics.numLines = cacheStatistics.numSets * cacheStatistics.associativity;	
+	cacheStatistics.cacheSize = cacheStatistics.numLines * cacheStatistics.lineSize ;	
+	
     
     // Allocate memory for both sets and cache (initialize all bytes to 0 with calloc)
     // ---------------------------------------
