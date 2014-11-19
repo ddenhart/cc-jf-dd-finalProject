@@ -43,10 +43,15 @@ int main(int argc, char * argv[])
 {
 	// Local variables
 	// ---------------
+<<<<<<< HEAD
+	char filename[100];  			// array for storing the trace file name
+	long int arg1, arg2, arg3;
+=======
 	FILE * traceFile;				// file descriptor for trace file
 	char filename[100];  			// array for storing the trace file name
 	long long arg1, arg2, arg3;
 	int i;
+>>>>>>> origin/master
 	// other local variables		
       	
       	
@@ -91,6 +96,60 @@ int main(int argc, char * argv[])
 		fprintf(stderr, "calloc failed\n");
 		return 1;
 	}
+<<<<<<< HEAD
+	for (unsigned int i = 0; i < cacheStatistics.numSets; ++i)
+	{
+		if ((cachePtr[i].setPtr = (cacheLine*)calloc(cacheStatistics.associativity, sizeof(cacheLine))) == NULL)
+		{
+			fprintf(stderr, "calloc failed\n");
+			exit(1);
+		}
+	}
+	
+	ParseFile(filename);
+	/* While not EOF
+	-----------------
+			Read line + error check
+			Parse line + eror check (See parsing algorithm)
+			Save command number in command variable
+			Save address index in set index variable
+			Save address tag in line tag variable
+			Examine command and choose command algorithm (See all commands algorithms)
+			Execute all steps in the appropriate command algorithm
+	*/
+	
+	
+	// Print statistics for the current trace file
+	// -------------------------------------------
+
+	
+	
+	// Deallocate memory for cache structure (all levels)
+	// --------------------------------------------------
+    free(cachePtr->setPtr);
+    free(cachePtr);
+
+	return 0;
+}
+
+/*==================================================================================
+							 UTILITY FUNCTIONS
+==================================================================================*/
+void ParseFile(char * Filename)
+{
+	FILE * traceFile;				// file descriptor for trace file
+	unsigned int characterInLine;   // Variable to hold character in line
+	unsigned int operation;
+	char lineHolder[SIZE];
+	int counter = 0;
+	int isSpace = 0;
+
+	// Open file and do error check
+	// ----------------------------
+	traceFile = fopen(Filename, "r");
+	if (traceFile == NULL)
+	{
+=======
  
     for(i = 0; i < cacheStatistics.numSets; ++i)
     {
@@ -107,10 +166,47 @@ int main(int argc, char * argv[])
  	traceFile = fopen(filename, "r"); 
  	if(traceFile == NULL)
 	{ 
+>>>>>>> origin/master
 		fprintf(stderr, "fopen failed\n");
 		exit(1);
 
 	}
+<<<<<<< HEAD
+	while (1)
+	{
+		characterInLine = fgetc(traceFile);
+		if (feof(traceFile))
+		{
+			lineHolder[counter] = '\0';
+			ParseAddress(lineHolder);
+			break;
+		}
+		if (characterInLine == '\n')
+		{
+			lineHolder[counter] = '\0';
+			ParseAddress(lineHolder);
+			isSpace = 0;
+			continue;
+		}
+		if (isspace(characterInLine))
+		{
+			isSpace = 1;
+			counter = 0;
+			continue;
+		}
+		if (!isSpace)
+			operation = characterInLine;
+		else
+			lineHolder[counter] = characterInLine;
+		++counter;
+	}
+	// Close file
+	// ----------
+	printf("tester");
+	fclose(traceFile);
+	return;
+}
+=======
 	
 	/* While not EOF
 	-----------------
@@ -137,8 +233,103 @@ int main(int argc, char * argv[])
 	// --------------------------------------------------
     free();
     free();
+>>>>>>> origin/master
 
-	return 0;
+void ParseAddress(char * HexAddress)
+{
+	int mini = 0;
+	int e = 0;
+	char holder[100];
+	_set_printf_count_output(1);
+	sscanf(HexAddress, "%x", &mini);
+	printf("%d\n",mini);
+	strtol()
+	//sprintf(holder, "%x", mini);
+	printf(holder);
+	printf("%s\n",HexAddress);
+	return;
 }
 
+<<<<<<< HEAD
+void OutputValidLines()
+{
+	unsigned int i, j;
+	unsigned int mesif;
+	for(i = 0; i < cacheStatistics.numSets; ++i)
+	{
+		if(cachePtr[i].validLineCounter != 0)
+		{
+			for(j = 0; j < cacheStatistics.associativity; ++j)
+			{
+				mesif = getMESIF(i, j);
+				if(mesif != INVALID)
+				{
+					printf("PlaceHolderText\n");
+				}					
+			}
+		}
+	}
+	
+}
+
+
+unsigned int getMESIF(unsigned int set, unsigned int line)
+{
+	unsigned int returnValue = 1;
+	return returnValue;
+}	
+
+// more to be determined
+	
+/*==================================================================================
+							 PROTOCOL FUNCTIONS
+==================================================================================*/
+
+// MESIF functions
+void BusOperation(char BusOp, unsigned int Address, char * SnoopResult)
+{
+
+}
+
+char GetSnoopResult(unsigned int Address)
+{
+	char c = 'a';
+	return c;
+}
+
+void PutSnoopResult(unsigned int Address, char SnoopResult)
+{
+
+}
+
+// Inclusivity functions
+void MessageToL2Cache(char BusOp, unsigned int Address)
+{
+
+}
+
+// Pseudo LRU functions
+void SetPseudoLRU()
+{
+
+}
+
+void GetPseudoLRU()
+{
+
+}
+
+// Other
+void ReadMemory()
+{
+
+}
+
+void WriteMemory()
+{
+
+}
+
+=======
+>>>>>>> origin/master
 

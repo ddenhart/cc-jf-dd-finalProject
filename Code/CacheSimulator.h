@@ -91,15 +91,13 @@ struct set_t * cachePtr;			// Cache = array of sets
 
 // Function Prototypes
 // -------------------
-//void BusOperation(char BusOp, unsigned int Address, char * SnoopResult); //defined in the mesif header
-//char GetSnoopResult(unsigned int Address); //defined in the mesif header
-//void PutSnoopResult(unsigned int Address, char Snoop Result); //defined in the mesif header
+
 void MessageToL2Cache(char BusOp, unsigned int Address);
 void SetPseudoLRU();
 void GetPseudoLRU();
 
-//void OutputValidLines();  //defined in output header
-//unsigned int getMESIF(unsigned int set, unsigned int line); //defined in the mesif header
+void OutputValidLines();  
+
 void ReadMemory();
 void WriteMemory();
 
