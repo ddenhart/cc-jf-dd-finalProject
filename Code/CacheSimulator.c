@@ -223,7 +223,8 @@ void ParseAddress(char * HexAddress)
 	_set_printf_count_output(1);
 	sscanf(HexAddress, "%x", &mini);
 	printf("%d\n",mini);
-	sprintf(holder, "%x", mini);
+	strtol()
+	//sprintf(holder, "%x", mini);
 	printf(holder);
 	printf("%s\n",HexAddress);
 	return;
