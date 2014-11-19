@@ -22,9 +22,9 @@ Description: 	This file contains:
 
 #include "CacheSimulator.h"
 
-==================================================================================
+/*==================================================================================
 							     DATA STRUCTURES
-==================================================================================
+==================================================================================*/
 
 // Cache statistics struct
 // -----------------------
@@ -40,40 +40,40 @@ struct statistics_t {
 	unsigned long int lineSize;		// line size in bytes
 	unsigned long int associativity;// cache degree of associativity
 	unsigned long int numSets; 		// number of sets in the cache 
-	unsigned long int numLines		// number of lines in the cache 
+	unsigned long int numLines;		// number of lines in the cache 
 } cacheStatistics;
 
 
 // Cache line struct
 // ------------------
-struct line_t {
-	uint8_t inclusivityBits;		// Line inclusivity bits (to be determined later)
-	uint8_t	mesifBits;				// Line MESIF coherence protocol bits
-	uint16_t tagBits;				// Line Tag bits
+typedef struct{
+	unsigned int inclusivityBits;		// Line inclusivity bits (to be determined later)
+	unsigned int mesifBits;				// Line MESIF coherence protocol bits
+	unsigned int tagBits;				// Line Tag bits
 } cacheLine;
 
 
 // Cache set struct
 // ----------------
-struct set_t {
-	uint8_t validLineCounter;		// Counter for number of valid lines in the set
+typedef struct{
+	unsigned int validLineCounter;		// Counter for number of valid lines in the set
 									// Helpful when printing valid lines to screen
-	uint16_t plruBits;				// Pseudo LRU replacement policy bits of the set
-	line_t * setPtr;					// Pointer to a line_t struct
+	unsigned int plruBits;				// Pseudo LRU replacement policy bits of the set
+	cacheLine * setPtr;					// Pointer to a line_t struct
 } cacheSet;
 
 
 // Cache (dynamic array of set structs)
 // ------------------------------------
-set_t * cachePtr;					// Cache = array of sets
+cacheSet * cachePtr;					// Cache = array of sets
 
 // Debug flag				
 // ----------
 int debugFlag;						// Debug flag across all functions
 
-==================================================================================
+/*==================================================================================
 							     MAIN FUNCTION
-==================================================================================
+==================================================================================*/
 
 
 int main(int argc, char * argv[])
@@ -81,8 +81,13 @@ int main(int argc, char * argv[])
 	// Local variables
 	// ---------------
 	FILE * traceFile;				// file descriptor for trace file
-	char filename[100];  			// array for storing the trace file name
+	const char filename[100];  			// array for storing the trace file name
 	long int arg1, arg2, arg3;
+	unsigned int characterInLine;
+	unsigned int operation;
+	char lineHolder[SIZE];
+	int counter = 0;
+	int isSpace = 0;
 	// other local variables		
       	
       	
@@ -107,9 +112,8 @@ int main(int argc, char * argv[])
 	arg1 = atol(argv[1]);
 	arg2 = atol(argv[2]);
 	arg3 = atol(argv[3]);
-	filename = argv[4];
+	strcpy(filename, argv[4]);
     debugFlag = atoi(argv[5]);
-    
     cacheStatistics.numSets = (unsigned long int)arg1;
     cacheStatistics.lineSize = (unsigned long int)arg2;
     cacheStatistics.associativity = (unsigned long int)arg3;
@@ -122,21 +126,19 @@ int main(int argc, char * argv[])
     
     // Allocate memory for both sets and cache (initialize all bytes to 0 with calloc)
     // ---------------------------------------
-    if(cacheSet.setPtr = (line_t*)calloc(sizeof(line_t*cacheStatistics.associativity)) == NULL)
-    { 
+	if ((cachePtr = (cacheSet*)calloc(cacheStatistics.numSets, sizeof(cacheSet))) == NULL)
+	{
 		fprintf(stderr, "calloc failed\n");
 		exit(1);
-
 	}
-    
-    if(cachePtr = (set_t*)calloc(sizeof(set_t*cacheStatistics.numSets)) == NULL)
-    { 
-		fprintf(stderr, "calloc failed\n");
-		exit(1);
-
+	for (int i = 0; i < cacheStatistics.numSets; ++i)
+	{
+		if ((cachePtr[i].setPtr = (cacheLine*)calloc(cacheStatistics.associativity, sizeof(cacheLine))) == NULL)
+		{
+			fprintf(stderr, "calloc failed\n");
+			exit(1);
+		}
 	}
-    
-    
     // Open file and do error check
     // ----------------------------
  	traceFile = fopen(filename, "r"); 
@@ -144,9 +146,35 @@ int main(int argc, char * argv[])
 	{ 
 		fprintf(stderr, "fopen failed\n");
 		exit(1);
-
 	}
-	
+	while (1)
+	{
+		characterInLine = fgetc(traceFile);
+		if (feof(traceFile))
+		{
+			lineHolder[counter] = '\0';
+			break;
+		}
+		if (characterInLine == '\n')
+		{
+			lineHolder[counter] = '\0';
+			isSpace = 0;
+			//counter = 0;
+			continue;
+		}
+		if (isspace(characterInLine))
+		{
+			isSpace = 1;
+			counter = 0;
+			continue;
+		}
+		if (!isSpace)
+			operation = characterInLine;
+		else
+			lineHolder[counter] = characterInLine;
+		printf(lineHolder);
+		++counter;
+	}
 	/* While not EOF
 	-----------------
 			Read line + error check
@@ -165,34 +193,34 @@ int main(int argc, char * argv[])
 
 	// Close file
 	// ----------
-	fclose(filename);
+	fclose(traceFile);
 	
 	
 	// Deallocate memory for cache structure (all levels)
 	// --------------------------------------------------
-    free();
-    free();
+    free(cachePtr->setPtr);
+    free(cachePtr);
 
 	return 0;
 }
 
-==================================================================================
+/*==================================================================================
 							 UTILITY FUNCTIONS
-==================================================================================
+==================================================================================*/
 void OutputValidLines()
 {
-	int i, j;
+	unsigned int i, j;
 	unsigned int mesif;
 	for(i = 0; i < cacheStatistics.numSets; ++i)
 	{
-		if(cachePtr[i]->validLineCounter != 0)
+		if(cachePtr[i].validLineCounter != 0)
 		{
-			for(j = 0; j < cacheStatistics.asscociativity; ++j)
+			for(j = 0; j < cacheStatistics.associativity; ++j)
 			{
 				mesif = getMESIF(i, j);
 				if(mesif != INVALID)
 				{
-					printf();
+					printf("PlaceHolderText\n");
 				}					
 			}
 		}
@@ -203,14 +231,15 @@ void OutputValidLines()
 
 unsigned int getMESIF(unsigned int set, unsigned int line)
 {
-
+	unsigned int returnValue = 1;
+	return returnValue;
 }	
 
 // more to be determined
 	
-==================================================================================
+/*==================================================================================
 							 PROTOCOL FUNCTIONS
-==================================================================================
+==================================================================================*/
 
 // MESIF functions
 void BusOperation(char BusOp, unsigned int Address, char * SnoopResult)
@@ -220,10 +249,11 @@ void BusOperation(char BusOp, unsigned int Address, char * SnoopResult)
 
 char GetSnoopResult(unsigned int Address)
 {
-
+	char c = 'a';
+	return c;
 }
 
-void PutSnoopResult(unsigned int Address, char Snoop Result)
+void PutSnoopResult(unsigned int Address, char SnoopResult)
 {
 
 }
@@ -232,7 +262,7 @@ void PutSnoopResult(unsigned int Address, char Snoop Result)
 void MessageToL2Cache(char BusOp, unsigned int Address)
 {
 
-{
+}
 
 // Pseudo LRU functions
 void SetPseudoLRU()

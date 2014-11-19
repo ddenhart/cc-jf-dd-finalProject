@@ -33,6 +33,9 @@ Description: 	This file contains:
 // #defines
 // ---------
 
+// Character Array Size
+
+#define SIZE			100		//Defined size of character array
 // Bus operation types
 #define READ			1		// Bus read
 #define WRITE			2		// Bus forward (also write-back???)
@@ -57,7 +60,7 @@ Description: 	This file contains:
 // -------------------
 void BusOperation(char BusOp, unsigned int Address, char * SnoopResult);
 char GetSnoopResult(unsigned int Address);
-void PutSnoopResult(unsigned int Address, char Snoop Result);
+void PutSnoopResult(unsigned int Address, char SnoopResult);
 void MessageToL2Cache(char BusOp, unsigned int Address);
 void SetPseudoLRU();
 void GetPseudoLRU();
