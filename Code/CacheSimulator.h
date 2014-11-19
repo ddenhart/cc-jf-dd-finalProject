@@ -58,6 +58,8 @@ Description: 	This file contains:
 
 // Function Prototypes
 // -------------------
+void ParseFile(char * Filename);
+void ParseAddress(char * HexAddress);
 void BusOperation(char BusOp, unsigned int Address, char * SnoopResult);
 char GetSnoopResult(unsigned int Address);
 void PutSnoopResult(unsigned int Address, char SnoopResult);

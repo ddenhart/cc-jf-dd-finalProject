@@ -80,14 +80,8 @@ int main(int argc, char * argv[])
 {
 	// Local variables
 	// ---------------
-	FILE * traceFile;				// file descriptor for trace file
-	const char filename[100];  			// array for storing the trace file name
+	char filename[100];  			// array for storing the trace file name
 	long int arg1, arg2, arg3;
-	unsigned int characterInLine;
-	unsigned int operation;
-	char lineHolder[SIZE];
-	int counter = 0;
-	int isSpace = 0;
 	// other local variables		
       	
       	
@@ -131,7 +125,7 @@ int main(int argc, char * argv[])
 		fprintf(stderr, "calloc failed\n");
 		exit(1);
 	}
-	for (int i = 0; i < cacheStatistics.numSets; ++i)
+	for (unsigned int i = 0; i < cacheStatistics.numSets; ++i)
 	{
 		if ((cachePtr[i].setPtr = (cacheLine*)calloc(cacheStatistics.associativity, sizeof(cacheLine))) == NULL)
 		{
@@ -139,42 +133,8 @@ int main(int argc, char * argv[])
 			exit(1);
 		}
 	}
-    // Open file and do error check
-    // ----------------------------
- 	traceFile = fopen(filename, "r"); 
- 	if(traceFile == NULL)
-	{ 
-		fprintf(stderr, "fopen failed\n");
-		exit(1);
-	}
-	while (1)
-	{
-		characterInLine = fgetc(traceFile);
-		if (feof(traceFile))
-		{
-			lineHolder[counter] = '\0';
-			break;
-		}
-		if (characterInLine == '\n')
-		{
-			lineHolder[counter] = '\0';
-			isSpace = 0;
-			//counter = 0;
-			continue;
-		}
-		if (isspace(characterInLine))
-		{
-			isSpace = 1;
-			counter = 0;
-			continue;
-		}
-		if (!isSpace)
-			operation = characterInLine;
-		else
-			lineHolder[counter] = characterInLine;
-		printf(lineHolder);
-		++counter;
-	}
+	
+	ParseFile(filename);
 	/* While not EOF
 	-----------------
 			Read line + error check
@@ -190,10 +150,6 @@ int main(int argc, char * argv[])
 	// Print statistics for the current trace file
 	// -------------------------------------------
 
-
-	// Close file
-	// ----------
-	fclose(traceFile);
 	
 	
 	// Deallocate memory for cache structure (all levels)
@@ -207,6 +163,72 @@ int main(int argc, char * argv[])
 /*==================================================================================
 							 UTILITY FUNCTIONS
 ==================================================================================*/
+void ParseFile(char * Filename)
+{
+	FILE * traceFile;				// file descriptor for trace file
+	unsigned int characterInLine;   // Variable to hold character in line
+	unsigned int operation;
+	char lineHolder[SIZE];
+	int counter = 0;
+	int isSpace = 0;
+
+	// Open file and do error check
+	// ----------------------------
+	traceFile = fopen(Filename, "r");
+	if (traceFile == NULL)
+	{
+		fprintf(stderr, "fopen failed\n");
+		exit(1);
+	}
+	while (1)
+	{
+		characterInLine = fgetc(traceFile);
+		if (feof(traceFile))
+		{
+			lineHolder[counter] = '\0';
+			ParseAddress(lineHolder);
+			break;
+		}
+		if (characterInLine == '\n')
+		{
+			lineHolder[counter] = '\0';
+			ParseAddress(lineHolder);
+			isSpace = 0;
+			continue;
+		}
+		if (isspace(characterInLine))
+		{
+			isSpace = 1;
+			counter = 0;
+			continue;
+		}
+		if (!isSpace)
+			operation = characterInLine;
+		else
+			lineHolder[counter] = characterInLine;
+		++counter;
+	}
+	// Close file
+	// ----------
+	printf("tester");
+	fclose(traceFile);
+	return;
+}
+
+void ParseAddress(char * HexAddress)
+{
+	int mini = 0;
+	int e = 0;
+	char holder[100];
+	_set_printf_count_output(1);
+	sscanf(HexAddress, "%x", &mini);
+	printf("%d\n",mini);
+	sprintf(holder, "%x", mini);
+	printf(holder);
+	printf("%s\n",HexAddress);
+	return;
+}
+
 void OutputValidLines()
 {
 	unsigned int i, j;
