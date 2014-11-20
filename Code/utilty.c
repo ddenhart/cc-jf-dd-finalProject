@@ -22,37 +22,45 @@ Description: 	This file contains:
 ==================================================================================*/
 
 // Address processing function (bit shifting utility function)
-void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag)
+void ParseAddress(unsigned int *address, unsigned int * index, unsigned int * tag)
 {
-	ConvertToBase(cacheStatistics.lineSize);
+	ConvertToBase(cacheStatistics.lineSize+33);
+	unsigned int numOffsetBits = ConvertToBase(cacheStatistics.lineSize);
 	//long double numOffsetBits = log2l(cacheStatistics.lineSize);
 	//unsigned long long int numOffsetBits = log2(cacheStatistics.lineSize);
 	//long double numIndexBits = log2l(cacheStatistics.numSets);
+	unsigned int numIndexBits = ConvertToBase(cacheStatistics.numSets);
 	//unsigned int numIndexBits = log2(cacheStatistics.numSets);
+	unsigned int addressSize = ADDR_SIZE;
 	//unsigned long long int addressSize = ADDR_SIZE;
 	//long double numTagBits = addressSize - (numOffsetBits + numIndexBits);
+	unsigned int numTagBits = addressSize - (numOffsetBits + numIndexBits);
 	//unsigned long long int numTagBits = addressSize - (numOffsetBits + numIndexBits);
-	//printf("\n%d, %d, %d, %d",addressSize, numOffsetBits, numIndexBits, numTagBits);
-	//*index = ((*address) << numTagBits) >> (numOffsetBits + numTagBits);
-	//*tag = (*address) >> (numOffsetBits + numIndexBits);
-	printf("hello");
+	printf("\n%d, %d, %d, %d",addressSize, numOffsetBits, numIndexBits, numTagBits);
+	*index = ((*address) << numTagBits) >> (numOffsetBits + numTagBits);
+	*tag = (*address) >> (numOffsetBits + numIndexBits);
 }
 
-void ConvertToBase(int num)
+int ConvertToBase(int num)
 {
-	printf("%d\n", num);
-	unsigned long long int ReturnNumber[100];
+	int total = 0;
 	int index = 0;
 	while (num != 0)
 	{
-		printf("Modulo %d\n", num % 2);
-		ReturnNumber[index] = num % 2;
+		if ((num % 2) == 1)
+		{
+			if (index == 0)
+				total += index + 1;
+			else
+				total += index;
+		}
 		num = num / 2;
 		++index;
 	}
-	printf("%d\n", index);
-	ReturnNumber[index] = '\0';
-	//printf("%d\n", ReturnNumber);
+	if (total == index - 1)
+		return (index - 1);
+	else
+		return index;
 }
 
 // Output the contents and state of all valid lines int the cache
