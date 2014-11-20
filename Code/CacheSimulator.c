@@ -35,18 +35,16 @@ Description: 	This file contains:
 #define DEBUG 1 //right now debug is true... we will replace this with a macro or 
                 //something later so it can be defined at runtime
 
-==================================================================================
+/*==================================================================================
 							     MAIN FUNCTION
-==================================================================================
+==================================================================================*/
 
 int main(int argc, char * argv[])
 {
 	// Local variables
 	// ---------------
-	FILE * traceFile;				// file descriptor for trace file
 	char filename[100];  			// array for storing the trace file name
-	long long arg1, arg2, arg3;
-	int i;
+	long int arg1, arg2, arg3;
 	// other local variables		
       	
       	
@@ -71,12 +69,12 @@ int main(int argc, char * argv[])
 	arg1 = atoll(argv[1]);
 	arg2 = atoll(argv[2]);
 	arg3 = atoll(argv[3]);
-	filename = argv[4];
+	strcpy(filename, argv[4]);
     debugFlag = atoi(argv[5]);
     
-    cacheStatistics.numSets = (long double)arg1;
-    cacheStatistics.lineSize = (long double)arg2;
-    cacheStatistics.associativity = (long double)arg3;
+    cacheStatistics.numSets = arg1;
+    cacheStatistics.lineSize = arg2;
+    cacheStatistics.associativity = arg3;
     
 
     // Compute and initialize all other cache attributes
@@ -91,54 +89,27 @@ int main(int argc, char * argv[])
 		fprintf(stderr, "calloc failed\n");
 		return 1;
 	}
- 
-    for(i = 0; i < cacheStatistics.numSets; ++i)
-    {
-    	if((cachePtr[i]->setPtr = (struct line_t*)calloc(cacheStatistics.associativity, sizeof(struct line_t))) == NULL)
-    	{ 
+	for (unsigned int i = 0; i < cacheStatistics.numSets; ++i)
+	{
+		if ((cachePtr[i].setPtr = (struct line_t*)calloc(cacheStatistics.associativity, sizeof(struct line_t))) == NULL)
+		{
 			fprintf(stderr, "calloc failed\n");
-			return 1;
-		}    	
-    }
-
-    
-    // Open file and do error check
-    // ----------------------------
- 	traceFile = fopen(filename, "r"); 
- 	if(traceFile == NULL)
-	{ 
-		fprintf(stderr, "fopen failed\n");
-		exit(1);
-
+			exit(1);
+		}
 	}
 	
-	/* While not EOF
-	-----------------
-			Read line + error check
-			Parse line + eror check (See parsing algorithm)
-			Save command number in command variable
-			Save address index in set index variable
-			Save address tag in line tag variable
-			Examine command and choose command algorithm (See all commands algorithms)
-			Execute all steps in the appropriate command algorithm
-	*/
+	ParseFile(filename);
 	
 	
 	// Print statistics for the current trace file
 	// -------------------------------------------
 
-
-	// Close file
-	// ----------
-	fclose(filename);
 	
 	
 	// Deallocate memory for cache structure (all levels)
 	// --------------------------------------------------
-    free();
-    free();
+    free(cachePtr->setPtr);
+    free(cachePtr);
 
 	return 0;
 }
-
-

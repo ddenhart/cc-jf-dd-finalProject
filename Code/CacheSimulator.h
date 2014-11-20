@@ -40,9 +40,9 @@ Description: 	This file contains:
 
 
 
-==================================================================================
+/*==================================================================================
 							     DATA STRUCTURES
-==================================================================================
+==================================================================================*/
 
 // Cache statistics struct
 // -----------------------
@@ -54,11 +54,11 @@ struct statistics_t {
 	double numWrites;				// number of cache writes
 	double numMisses;				// number of cache misses 
 	
-	long double cacheSize; 			// cache size in bytes
-	long double lineSize;			// line size in bytes
-	long double associativity;		// cache degree of associativity
-	long double numSets; 			// number of sets in the cache 
-	long double numLines			// number of lines in the cache 
+	unsigned int cacheSize; 		// cache size in bytes
+	unsigned int lineSize;			// line size in bytes
+	unsigned int associativity;		// cache degree of associativity
+	unsigned int numSets; 			// number of sets in the cache 
+	unsigned int numLines;			// number of lines in the cache 
 } cacheStatistics;
 
 
@@ -88,18 +88,28 @@ struct set_t * cachePtr;			// Cache = array of sets
 // Debug flag - alternate to ifdef				
 // ----------
 //int debugFlag;						// Debug flag across all functions
+//Utility Prototypes
+//------------------
+void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
+void ConvertToBase(int num);
+void OutputValidLines();
+unsigned int GetMesifState(unsigned int set, unsigned int line);
+int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue);
+unsigned int ReadPseudoLRU(unsigned int set);
+unsigned int GetInclusivityBits(unsigned int set, unsigned int line);
+unsigned int SetInclusivityBits();
+unsigned int GetLineTag(unsigned int set, unsigned int line);
+unsigned int SetLineTag();
 
 // Function Prototypes
 // -------------------
-//void BusOperation(char BusOp, unsigned int Address, char * SnoopResult); //defined in the mesif header
-//char GetSnoopResult(unsigned int Address); //defined in the mesif header
-//void PutSnoopResult(unsigned int Address, char Snoop Result); //defined in the mesif header
+
 void MessageToL2Cache(char BusOp, unsigned int Address);
 void SetPseudoLRU();
 void GetPseudoLRU();
 
-//void OutputValidLines();  //defined in output header
-//unsigned int getMESIF(unsigned int set, unsigned int line); //defined in the mesif header
+void OutputValidLines();  
+
 void ReadMemory();
 void WriteMemory();
 
