@@ -27,27 +27,6 @@ Description: 	This file contains:
 
 #define ADDR_SIZE			32		// All addresses are 32 bits
 
-// Bus operation types
-#define READ				1		// Bus read
-#define WRITE				2		// Bus forward (also write-back???)
-#define INVALIDATE			3		// Bus invalidate
-#define RWIM				4		// Bus read with intend to modify
-
-
-// Snoop result types
-#define NOHIT				0		// No hit
-#define HIT					1		// Hit
-#define HITM				2		// Hit to a modified line
-
-
-// MESIF states
-#define INVALID				0		// Cache line is invalid
-#define FORWARD				1		// Cache line is in the shared state and this is the forwarding processor
-#define SHARED				2		// At least two other caches have the line and memory is up to date
-#define EXCLUSIVE			3		// Only this cache has the line and the memory is up to date
-#define MODIFIED			4		// Only this cache has the line and the memory is stale
-
-
 // Trace File Commands
 #define DATA_READ_REQ		0		// Command 0 = read request from L2 data cache
 #define DATA_WRITE_REQ		1		// Command 1 = write request from L2 data cache
@@ -106,9 +85,21 @@ struct set_t {
 // ------------------------------------
 struct set_t * cachePtr;			// Cache = array of sets
 
-// Debug flag				
+// Debug flag - alternate to ifdef				
 // ----------
-int debugFlag;						// Debug flag across all functions
+//int debugFlag;						// Debug flag across all functions
+//Utility Prototypes
+//------------------
+void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
+void ConvertToBase(int num);
+void OutputValidLines();
+unsigned int GetMesifState(unsigned int set, unsigned int line);
+int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue);
+unsigned int ReadPseudoLRU(unsigned int set);
+unsigned int GetInclusivityBits(unsigned int set, unsigned int line);
+unsigned int SetInclusivityBits();
+unsigned int GetLineTag(unsigned int set, unsigned int line);
+unsigned int SetLineTag();
 
 //Utility Prototypes
 //------------------
@@ -125,15 +116,19 @@ unsigned int SetLineTag();
 
 // Function Prototypes
 // -------------------
+<<<<<<< HEAD
 void BusOperation(char BusOp, unsigned int Address, char * SnoopResult);
 char GetSnoopResult(unsigned int Address);
 void PutSnoopResult(unsigned int Address, char SnoopResult);
+=======
+
+>>>>>>> origin/master
 void MessageToL2Cache(char BusOp, unsigned int Address);
 void SetPseudoLRU();
 void GetPseudoLRU();
 
-void OutputValidLines();
-unsigned int getMESIF(unsigned int set, unsigned int line);
+void OutputValidLines();  
+
 void ReadMemory();
 void WriteMemory();
 
