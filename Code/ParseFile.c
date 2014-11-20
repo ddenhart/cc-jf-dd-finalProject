@@ -92,6 +92,7 @@ void ParseHexAddress(char * HexAddress)
 	sscanf(HexAddress, "%x", &mini);
 	printf("%d\n", mini);
 	ParseAddress(&mini, &index, &tag);
+	printf("\n%d, %d", index, tag);
 	printf("\n%x, %x\n", index, tag);
 	//e = (int)strtol(HexAddress, NULL, 16);
 	//sprintf(holder, "%x", mini);
