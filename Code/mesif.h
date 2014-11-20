@@ -16,24 +16,18 @@ Description: 	This file contains:
 	
 ================================================================================== */
 
-<<<<<<< HEAD
 #define MAX_STATE_COMBO 3;
-=======
 
-const int MAX_STATE_COMBO = 3;
->>>>>>> origin/master
-
-enum Mesif_states { eINVALID  = 0, // Cache line is invalid					eMODIFIED = eINVALID +1, // Only this cache has the line and the memory is stale					eSHARED = eMODIFIED +1, // At least two other caches have the line and memory is up to date					eEXCLUSIVE = eSHARED + 1, // Only this cache has the line and the memory is up to date					eFORWARD = eEXCLUSIVE +1, // Cache line is in the shared state and this is the forwarding processor					eMAX_STATES = eFORWARD +1 };
-// Bus operation typesenum bus_ops { eREAD = 1, // Bus read
-			   eWRITE = eREAD +1, // Bus forward (also write-back???)
-			   eINVALIDATE = eWRITE +1, // Bus invalidate
-			   eRWIM = eINVALIDATE +1, // Bus read with intend to modify
+enum Mesif_states { eINVALID  = 0,					eMODIFIED = eINVALID +1,					eSHARED = eMODIFIED +1, 					eEXCLUSIVE = eSHARED + 1, 					eFORWARD = eEXCLUSIVE +1, 					eMAX_STATES = eFORWARD +1 };enum bus_ops { eREAD = 1, 
+			   eWRITE = eREAD +1, 
+			   eINVALIDATE = eWRITE +1,
+			   eRWIM = eINVALIDATE +1, 
 			   eB_MAX_EVENTS = eRWIM +1 };
 
-// Snoop result types
-enum snoop_res { eNOHIT = 0, // No hit
-				eHIT = eNOHIT +1, // Hit
-				eHITM = eHIT +1, // Hit to a modified line
+
+enum snoop_res { eNOHIT = 0,
+				eHIT = eNOHIT +1, 
+				eHITM = eHIT +1, 
 				eS_MAX_EVENTS = eHITM +1 };
 
 //mesif error codes
@@ -50,7 +44,7 @@ struct sMesif {
 	enum mesif_err eERROR;
 };
 
-enum Mesif_states currentMesifState(unsigned long lAddress, unsigned lLine);
+
 enum bus_ops nextBusEvent(enum Mesif_states current_state);
 enum bus_ops getBusEvent();
 enum snoop_res nextSnoopEvent(enum Mesif_states current_state);
