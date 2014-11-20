@@ -40,9 +40,9 @@ Description: 	This file contains:
 
 
 
-==================================================================================
+/*==================================================================================
 							     DATA STRUCTURES
-==================================================================================
+==================================================================================*/
 
 // Cache statistics struct
 // -----------------------
@@ -54,11 +54,11 @@ struct statistics_t {
 	double numWrites;				// number of cache writes
 	double numMisses;				// number of cache misses 
 	
-	long double cacheSize; 			// cache size in bytes
-	long double lineSize;			// line size in bytes
-	long double associativity;		// cache degree of associativity
-	long double numSets; 			// number of sets in the cache 
-	long double numLines			// number of lines in the cache 
+	unsigned int cacheSize; 		// cache size in bytes
+	unsigned int lineSize;			// line size in bytes
+	unsigned int associativity;		// cache degree of associativity
+	unsigned int numSets; 			// number of sets in the cache 
+	unsigned int numLines;			// number of lines in the cache 
 } cacheStatistics;
 
 
@@ -88,6 +88,18 @@ struct set_t * cachePtr;			// Cache = array of sets
 // Debug flag - alternate to ifdef				
 // ----------
 //int debugFlag;						// Debug flag across all functions
+//Utility Prototypes
+//------------------
+void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
+void ConvertToBase(int num);
+void OutputValidLines();
+unsigned int GetMesifState(unsigned int set, unsigned int line);
+int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue);
+unsigned int ReadPseudoLRU(unsigned int set);
+unsigned int GetInclusivityBits(unsigned int set, unsigned int line);
+unsigned int SetInclusivityBits();
+unsigned int GetLineTag(unsigned int set, unsigned int line);
+unsigned int SetLineTag();
 
 // Function Prototypes
 // -------------------
