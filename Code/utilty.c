@@ -22,7 +22,7 @@ Description: 	This file contains:
 ==================================================================================*/
 
 // Address processing function (bit shifting utility function)
-void ParseAddress(unsigned int *address, unsigned int * index, unsigned int * tag)
+void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag)
 {
 	ConvertToBase(cacheStatistics.lineSize+33);
 	unsigned int numOffsetBits = ConvertToBase(cacheStatistics.lineSize);
@@ -86,26 +86,26 @@ void OutputValidLines()
 	
 }
 
-
+//alreadly in mesif files
 // Read the line MESIF state
 // -------------------------
-unsigned int GetMesifState(unsigned int set, unsigned int line) 
-{
-	return cachePtr[set].setPtr[line].mesifBits;
-}	
+//unsigned int GetMesifState(unsigned int set, unsigned int line) 
+//{
+//	return cachePtr[set].setPtr[line].mesifBits;
+//}	
 
 
 // Change the line MESIF state
 // ---------------------------
-int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue) 
-{
-	cachePtr[set].setPtr[line].mesifBits = newValue;
-	if((cachePtr[set].setPtr[line].mesifBits < INVALID) || (cachePtr[set].setPtr[line].mesifBits > MODIFIED))
-	{
-		return 1; // If the new MESIF state is not a valid MESIF state, return error code 1
-	}
-	
-}	
+//int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue) 
+//{
+//	cachePtr[set].setPtr[line].mesifBits = newValue;
+//	if((cachePtr[set].setPtr[line].mesifBits < INVALID) || (cachePtr[set].setPtr[line].mesifBits > MODIFIED))
+//	{
+//		return 1; // If the new MESIF state is not a valid MESIF state, return error code 1
+//	}
+//	
+//}	
 
 // Read the set pseudo LRU bits
 // ----------------------------
