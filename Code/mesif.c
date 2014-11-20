@@ -118,7 +118,7 @@ void snoopStateSelect( enum snoop_res eSnoopCurrent, enum snoop_res *eSnoopNext)
 void BusOperation(enum bus_ops BusOp, unsigned int Address, enum snoop_res *SnoopResult)
 {
 	#ifndef DEBUG
-		printf(“BusOp:%d,Address:%h,SnoopResult:%d\n”,*SnoopResult);
+		printf("BusOp:%d,Address:%h,SnoopResult:%d\n",*SnoopResult);
 	#endif
 
 

@@ -16,7 +16,7 @@ Description: 	This file contains:
 	
 ================================================================================== */
 
-const int MAX_STATE_COMBO = 3;
+#define MAX_STATE_COMBO 3;
 
 enum Mesif_states { eINVALID  = 0,					eMODIFIED = eINVALID +1,					eSHARED = eMODIFIED +1, 					eEXCLUSIVE = eSHARED + 1, 					eFORWARD = eEXCLUSIVE +1, 					eMAX_STATES = eFORWARD +1 };enum bus_ops { eREAD = 1, 
 			   eWRITE = eREAD +1, 
