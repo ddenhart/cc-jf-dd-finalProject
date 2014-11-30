@@ -25,6 +25,7 @@ Description: 	This file contains:
 // Address 
 // --------
 
+#define DEBUG				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
 
 // Trace File Commands
@@ -85,29 +86,28 @@ struct set_t {
 // ------------------------------------
 struct set_t * cachePtr;			// Cache = array of sets
 
-// Debug flag - alternate to ifdef				
-// ----------
-//int debugFlag;						// Debug flag across all functions
-//Utility Prototypes
-//------------------
+
+// Dynamic array for pseudo LRU binary search
+// ----------------------------------
+int * binarySearchArray;			
+
+
+
+// Utility Prototypes
+// ------------------
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 int ConvertToBase(int num);
 void OutputValidLines();
-unsigned int ReadPseudoLRU(unsigned int set);
 unsigned int GetInclusivityBits(unsigned int set, unsigned int line);
 unsigned int SetInclusivityBits();
 unsigned int GetLineTag(unsigned int set, unsigned int line);
 unsigned int SetLineTag();
 
+
 // Function Prototypes
 // -------------------
-
 void MessageToL2Cache(char BusOp, unsigned int Address);
-void SetPseudoLRU();
-void GetPseudoLRU();
-
 void OutputValidLines();  
-
 void ReadMemory();
 void WriteMemory();
 

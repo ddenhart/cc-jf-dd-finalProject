@@ -1,27 +1,33 @@
 /* ==================================================================================
 
-ECE 485 / Fall 2014 / Cache simulator project
-Team: 
+	ECE 485 / Fall 2014 / Cache simulator project
+	Team:
 		Carmen Ciobanu
 		Deborah Denhart
 		Jeremiah Franke
 		
-==================================================================================
+   ==================================================================================
 
-File: 			utility.c
-Date:			11/16/2014
-Author:			
-Description: 	This file contains:
-				- 
+	File:				utility.c
+	Date:			11/16/2014
+	Author:			Carmen Ciobanu
+						Jeremiah Franke
+	Description:	This file contains: UTILITY FUNCTIONS
 	
-================================================================================== */
+   ================================================================================== */
+
 #include "CacheSimulator.h"
+#include "mesif.h"
 
-/*==================================================================================
-							 UTILITY FUNCTIONS
-==================================================================================*/
+/* ==================================================================================
+	Function name:	ParseAddress
+ 	Arguments:			unsigned int * address
+ 	 	 	 	 				unsigned int * index
+ 	 	 	 	 				unsigned int * tag
+	Returns:				void
+	Description:			Address processing function (bit shifting utility function)
+   ================================================================================== */
 
-// Address processing function (bit shifting utility function)
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag)
 {
 	ConvertToBase(cacheStatistics.lineSize+33);
@@ -40,6 +46,14 @@ void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * t
 	*index = ((*address) << numTagBits) >> (numOffsetBits + numTagBits);
 	*tag = (*address) >> (numOffsetBits + numIndexBits);
 }
+
+
+/* ==================================================================================
+	Function name:	ConvertToBase
+ 	Arguments:			int num
+	Returns:				void
+	Description:
+   ================================================================================== */
 
 int ConvertToBase(int num)
 {
@@ -63,8 +77,14 @@ int ConvertToBase(int num)
 		return index;
 }
 
-// Output the contents and state of all valid lines int the cache
-// --------------------------------------------------------------
+
+/* ==================================================================================
+	Function name:	OutputValidLines
+ 	Arguments:			void
+	Returns:				void
+	Description:			Output the contents and state of all valid lines in the cache
+   ================================================================================== */
+
 void OutputValidLines()
 {
 	unsigned int i, j;
@@ -75,51 +95,46 @@ void OutputValidLines()
 		{
 			for(j = 0; j < cacheStatistics.associativity; ++j)
 			{
+				/*
 				mesifState = GetMesifState(i, j);
-				if(mesifState != INVALID)
+				if(mesifState != eINVALID)
 				{
 					printf();	// Print line contents and state
-				}					
+				}		
+				*/			
 			}
 		}
 	}
 	
 }
 
-//alreadly in mesif files
-// Read the line MESIF state
-// -------------------------
-//unsigned int GetMesifState(unsigned int set, unsigned int line) 
-//{
-//	return cachePtr[set].setPtr[line].mesifBits;
-//}	
 
 
-// Change the line MESIF state
-// ---------------------------
-//int SetMesifState(unsigned int set, unsigned int line, unsigned int newValue) 
-//{
-//	cachePtr[set].setPtr[line].mesifBits = newValue;
-//	if((cachePtr[set].setPtr[line].mesifBits < INVALID) || (cachePtr[set].setPtr[line].mesifBits > MODIFIED))
-//	{
-//		return 1; // If the new MESIF state is not a valid MESIF state, return error code 1
-//	}
-//	
-//}	
-
-// Read the set pseudo LRU bits
-// ----------------------------
-unsigned int ReadPseudoLRU(unsigned int set)		
+/* ==================================================================================
+	Function name:	GetMesifState
+ 	Arguments:		unsigned int set = number of the set containing the desired line
+ 	 	 	 	 	unsigned int line = number of the line we want to get the MESIF bits for
+	Returns:		void
+	Description:	Read the line MESIF state
+   ================================================================================== */
+/*
+unsigned int GetMesifState(unsigned int set, unsigned int line)
 {
-	return cachePtr[set].plruBits;
+		return cachePtr[set]->setPtr[line]->mesifBits;
 }
+*/
 
+/* ==================================================================================
+	Function name:	GetInclusivityBits
+ 	Arguments:			unsigned int set = number of the set containing the desired line
+ 	 	 	 	 	 	 	 	unsigned int line = number of the line we want to get the inclusivity bits for
+	Returns:				unisgned int = contains the value of the inclusivity bits
+	Description:			Read the inclusivity bits value for a line
+   ================================================================================== */
 
-// Read the line inclusivity bits
-// ------------------------------
 unsigned int GetInclusivityBits(unsigned int set, unsigned int line)	
 {
-	return cachePtr[set].setPtr[line].inclusivityBits;
+	return cachePtr[set]->setPtr[line]->inclusivityBits;
 }
 
 
@@ -127,6 +142,7 @@ unsigned int GetInclusivityBits(unsigned int set, unsigned int line)
 // ------------------------------
 unsigned int SetInclusivityBits()	
 {
+	return 0;
 
 }
 
@@ -143,7 +159,7 @@ unsigned int GetLineTag(unsigned int set, unsigned int line)
 // ------------------
 unsigned int SetLineTag()		
 {
-
+	return 0;
 }
 
 // more to be determined
@@ -160,6 +176,7 @@ void BusOperation(char BusOp, unsigned int Address, char * SnoopResult)
 
 char GetSnoopResult(unsigned int Address)
 {
+	return 0;
 
 }
 
@@ -195,5 +212,4 @@ void WriteMemory()
 {
 
 }
-
 

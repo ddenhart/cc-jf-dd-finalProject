@@ -11,6 +11,7 @@ Team:
 File: 			CacheSimulator.c
 Date:			11/16/2014
 Author:			Carmen Ciobanu
+                Jeremiah Franke
 Description: 	This file contains:
 				- global definitions (data structures)
 				- main function
@@ -55,9 +56,8 @@ int main(int argc, char * argv[])
 	 	Argv[2] = line size in bytes (store in cacheStatistics.lineSize)
 	 	Argv[3] = cache associativity (store in cacheStatistics.associativity)
 	 	Argv[4] = trace file name (store in filename)
-	 	Argv[5] = debug flag (store in debugFlag)
 	*/
-	if(argc != 6)
+	if(argc != 5)
 	{
 		fprintf(stderr, "Usage: %s	#Sets	Line size in bytes	Associativity	Trace file name		Debug flag\n", argv[0]);
 		return 1;
@@ -70,7 +70,6 @@ int main(int argc, char * argv[])
 	arg2 = atoll(argv[2]);
 	arg3 = atoll(argv[3]);
 	strcpy(filename, argv[4]);
-    debugFlag = atoi(argv[5]);
     
     cacheStatistics.numSets = arg1;
     cacheStatistics.lineSize = arg2;
@@ -86,18 +85,42 @@ int main(int argc, char * argv[])
     // ---------------------------------------
     if((cachePtr = (struct set_t*)calloc(cacheStatistics.numSets, sizeof(struct set_t))) == NULL)
 	{ 
-		fprintf(stderr, "calloc failed\n");
+		fprintf(stderr, "Calloc failed to allocate memory for the cache\n");
 		return 1;
 	}
-	for (unsigned int i = 0; i < cacheStatistics.numSets; ++i)
+	
+	for (i = 0; i < cacheStatistics.numSets; ++i)
 	{
 		if ((cachePtr[i].setPtr = (struct line_t*)calloc(cacheStatistics.associativity, sizeof(struct line_t))) == NULL)
 		{
-			fprintf(stderr, "calloc failed\n");
-			exit(1);
+			fprintf(stderr, "Calloc failed to allocate memory for set %d\n", i);
+			return 1;
 		}
 	}
 	
+	
+	// Create binary search array for pseudo LRU algorithm
+	// ---------------------------------------------------
+	if ((binarySearchArray = (int*) malloc(sizeof(int) * cacheStatistics.associativity)) == NULL)
+	{
+		fprintf(stderr, "In function %s, line %d: malloc failed to allocate the binary search array\n", __FUNCTION__, __LINE__);
+		return -1; 
+	}
+
+
+	// Populate binary search array with all line numbers in the set
+	// -------------------------------------------------------------
+	for(i = 0; i <  cacheStatistics.associativity; ++i)
+	{
+		binarySearchArray[i] = i;
+#ifdef DEBUG
+		printf("Binary search array [%d] = %d\n", i, i);
+#endif
+	}
+	
+	
+	// Parse trace file
+	// -----------------	
 	ParseFile(filename);
 	
 	
@@ -108,8 +131,16 @@ int main(int argc, char * argv[])
 	
 	// Deallocate memory for cache structure (all levels)
 	// --------------------------------------------------
-    free(cachePtr->setPtr);
+    for (i = 0; i < cacheStatistics.numSets; ++i)	
+	{
+		if (cachePtr[i].setPtr)
+		{
+			free(cachePtr[i].setPtr);
+		}
+	}
+
     free(cachePtr);
+    free(binarySearchArray);
 
 	return 0;
 }
