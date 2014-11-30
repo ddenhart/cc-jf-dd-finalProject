@@ -25,7 +25,7 @@ Description: 	This file contains:
 // Address 
 // --------
 
-#define DEBUG				1
+//#define DEBUG				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
 
 // Trace File Commands
