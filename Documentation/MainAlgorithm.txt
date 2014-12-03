@@ -1,0 +1,189 @@
+========================================================================================
+ECE 485 / Cache project
+Main algorithm
+Carmen Ciobanu
+11/28/2012
+========================================================================================
+
+ Unsolved Problems:
+ -------------------
+  - Assume for now we are not using a buffer!!!! but we will have to think about this!
+  - The data at addresses coming with command 2 should not be writeable because they
+  are instructions. How do we handle this??? Maybe we can split the address space into
+  2 categories: data addresses and instruction addresses and group these with the
+  commands 0 and 2.
+  - Don't forget to also send eviction notice to L2 when a line in L3 is invalidated
+ 
+========================================================================================
+								READ (command 0 and 2)
+========================================================================================
+
+Check  tags for all lines in set
+
+// Tags match, we get the line we want 
+// -----------------------------------
+if tag == MATCH
+
+	// Line is invalid - Cache MISS
+	// ----------------------------
+	if MESIF state == INVALID
+		Increment number of misses for statistics	
+		Increment number of accesses for statistics	
+		Increment number of reads for statistics	
+		
+		Update MESIF state  		
+			MESIF related stuff	(not detailed here)
+			if command == 2
+				read is from instruction part of L2 cache
+				GetSnoopResult cannot return HITM since an instruction could never have been modified 	
+			Bus op = Read cache line from memory (send in address to read_memory stub code)
+
+		Write tag bits
+		Write pseudo LRU bits (send in flag CACHE_MISS)
+		Send message to L2 
+			" Sending x bytes starting at address y to L2" (mention number
+			of bytes sent since L2 line is half the size of L3 line)
+			
+
+	// Line is valid & tags match - cache HIT
+	// --------------------------------------
+	else
+		Increment number of hits for statistics	
+		Increment number of accesses for statistics	
+		Increment number of reads for statistics							
+		
+		Update MESIF state 
+		Write pseudo LRU bits 
+		Send message to L2
+			" Sending x bytes starting at address y to L2" (mention number
+			of bytes sent since L2 line is half the size of L3 line)
+
+						
+// Tags dont match any of the line tags - Cache Miss
+// --------------------------------------------------	
+else if tag == NO MATCH
+		
+		Increment number of misses for statistics	
+		Increment number of accesses for statistics	
+		Increment number of reads for statistics
+		
+		Select line to evict and write pseudo LRU bits (send in flag EVICT_LINE)
+		Capture return to see if line is to be evicted or not
+		If no line to be evicted
+				it means we are using an invalid line to put the new data in so no need to write it to memory
+		else
+			Check MESIF state 
+			if MESIF state == MODIFIED
+				we need to write dirty line to memory 
+			else
+				line was not dirty so it can be overwritten
+		
+		Update MESIF state											
+			MESIF related stuff				
+			Bus op = Read cache line from memory (send in address to read_memory stub code)
+		
+		Write tag bits
+		Send message to L2 
+			" Sending x bytes starting at address y to L2" (mention number
+			of bytes sent since L2 line is half the size of L3 line)
+			If line evicted in L3
+				send eviction notice to L2 (send addresses for multiple lines if cache line sizes are different)
+			else
+				no eviction notice sent
+			
+	
+========================================================================================
+								WRITE (command 1)
+========================================================================================
+
+Check  tags for all lines in set
+
+// Tags match, we get the line we want 
+// -----------------------------------
+if tag == MATCH
+
+	// Line is invalid - Cache MISS
+	// ----------------------------
+	if MESIF state == INVALID
+		Increment number of misses for statistics	
+		Increment number of accesses for statistics	
+		Increment number of writes for statistics	
+		
+		Update MESIF state 		
+			MESIF related stuff				
+			Bus op = Read cache line from memory with intend to modify
+						(send in address to write_memory stub code)
+		Write tag bits
+		Write pseudo LRU bits (send in flag CACHE_MISS)
+		Send message to L2 
+			"Sending x bytes starting at address y to L2" (mention number
+			of bytes sent since L2 line is half the size of L3 line)
+			
+
+	// Line is valid & tags match - cache HIT
+	// --------------------------------------
+	else
+		Increment number of hits for statistics	
+		Increment number of accesses for statistics	
+		Increment number of writes for statistics							
+		
+		Update MESIF state and do bus op if applicable
+		Write pseudo LRU bits 
+		Send message to L2
+			" Sending x bytes starting at address y to L2" (mention number
+			of bytes sent since L2 line is half the size of L3 line)
+
+						
+// Tags dont match any of the line tags - Cache Miss
+// --------------------------------------------------	
+else if tag == NO MATCH
+		
+		Increment number of misses for statistics	
+		Increment number of accesses for statistics	
+		Increment number of writes for statistics
+		
+		Select line to evict and write pseudo LRU bits (send in flag EVICT_LINE)
+		Capture return to see if line is to be evicted or not
+		If no line to be evicted
+				it means we are using an invalid line to put the new data in so no need to write it to memory
+		else
+			Check MESIF state 
+			if MESIF state == MODIFIED
+				we need to write dirty line to memory 
+			else
+				line was not dirty so it can be overwritten
+		
+		Update MESIF state											
+			MESIF related stuff				
+			Bus op = Read cache line from memory with intend to modify
+						(send in address to write_memory stub code)
+		Write tag bits
+		Send message to L2 
+			" Sending x bytes starting at address y to L2" (mention number of bytes 
+									sent since L2 line is half the size of L3 line)
+			If line evicted in L3
+				send eviction notice to L2 (send addresses for multiple lines if cache since cache line sizes are different)
+			else
+				no eviction notice sent
+
+========================================================================================
+								CLEAR (command 8)
+========================================================================================
+
+for all sets in the cache
+	for all lines in the set
+		zero out all memory
+
+
+========================================================================================
+								DISPLAY VALID LINES (command 9)
+========================================================================================
+
+for all sets in the cache
+	for all lines in the set
+		check MESIF state
+		if MESIF state is NOT INVALID
+			display the values of the tag and MESIF state
+			display the values of the LRU bits
+
+
