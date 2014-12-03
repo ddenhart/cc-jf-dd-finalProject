@@ -4,17 +4,19 @@
 		Carmen Ciobanu
 		Deborah Denhart
 		Jeremiah Franke
-   ==================================================================================
-   File:              CacheSimulator.h
-   Date:            11/16/2014
-   Author:         Carmen Ciobanu
-                        Deborah Denhart
-                        Jeremiah Franke
-   Description: 	This file contains:
-                        - #defines
-                        - data structures
-                        - function prototypes
-   ================================================================================== */
+==================================================================================
+File: 			CacheSimulator.h
+Date:			11/16/2014
+Author:			Carmen Ciobanu
+				Deborah Denhart
+				Jeremiah Franke
+Modified:		Deborah Denhart		12/02/14
+                
+Description: 	This file contains:
+				- #defines
+				- #includes
+				- function prototypes
+================================================================================== */
 
 
 #include <stdint.h>				// for special data types like uint8_t, uint16_t
@@ -23,30 +25,43 @@
 #include <errno.h>				// error macros
 #include <math.h>				// basic match library
 #include <stdlib.h>				// general utilities
-#include <string.h>				// string handling
 
+// #defines
+// ---------
+#define TRUE 1
+#define FALSE 0
 
-//#define SILENT                            1
-#define DEBUG                             1
-#define ADDR_SIZE                      32		// All addresses are 32 bits
+// default cache parameters - set to max available?
+#define WORD_SIZE 8
+#define MAX_CAPACITY (8 * 1024 * 1024)
+#define BLOCK_SIZE 8
+#define MAX_ASSOCIATIVITY 16
+#define LINES_SIZE 64
+
+//dd TODO: should we use silent or debug? i am used to debug but faust uses silent...
+#define DEBUG				1
+#define ADDR_SIZE			32		// All addresses are 32 bits
 
 // Trace File Commands
-#define DATA_READ_REQ            0		// Command 0 = read request from L2 data cache
-#define DATA_WRITE_REQ          1		// Command 1 = write request from L2 data cache
-#define INSTR_READ_REQ           2		// Command 2 = read request from L2 instruction cache
-#define SNOOPED_INVALIDATE   3		// Command 3 = snooped invalidate command
-#define SNOOPED_READ              4		// Command 4 = snooped read request
-#define SNOOPED_WRITE            5		// Command 5 = snooped write request
-#define	SNOOPED_RWIM           6		// Command 6 = snooped read with intent to modify
-#define CLEAR_CACHE                 8		// Command 8 = clear cache / reset all states
-#define PRINT_VALID_LINES        9		// Command 9 = print valid lines' contents and state
+#define DATA_READ_REQ		0		// Command 0 = read request from L2 data cache
+#define DATA_WRITE_REQ		1		// Command 1 = write request from L2 data cache
+#define INSTR_READ_REQ		2		// Command 2 = read request from L2 instruction cache
+#define SNOOPED_INVALIDATE	3		// Command 3 = snooped invalidate command
+#define SNOOPED_READ		4		// Command 4 = snooped read request
+#define SNOOPED_WRITE		5		// Command 5 = snooped write request
+#define	SNOOPED_RWIM		6		// Command 6 = snooped read with intent to modify
+#define CLEAR_CACHE			8		// Command 8 = clear cache / reset all states
+#define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
 #define EVICT_LINE						0
 #define CACHE_HIT						1
 #define CACHE_MISS					2
-#define FALSE								0
-#define TRUE									1
+
+// consts
+const int INPUT_BUFFER_SIZE = 100;
+
+
 
 
 /*  DATA STRUCTURES  */
@@ -87,13 +102,21 @@ int * binarySearchArray;
 
 
 /*  FUNCTION PROTOTYPES  */
+// Utility Prototypes
+// ------------------
+//dd TODO: is it ok to add these?
+int initCache();
+void delCache();
+char* handleInputs(char **argv, int argc, char *filename);
+void setCacheParams(long int *arg);
+void flushCache();
+void resetCache();
+unsigned int takeLogBase2 (unsigned int vars);
 
-// Utility Functions
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 int ConvertToBase(int num);
-void OutputValidLines();
-void OutputStatistics();
-int GetMesifState(unsigned int set, unsigned int line);
+//dd TODO: moved to output.h void OutputValidLines();
+//dd TODO: moved to mesif.h int GetMesifState(unsigned int set, unsigned int line);
 unsigned int GetLineTag(unsigned int set, unsigned int line);
 void SetLineTag();
 int CreateCache();
@@ -118,7 +141,7 @@ int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bit
 int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, int * eviction);
 
 // Inclusion Function
-void MessageToL2Cache(char BusOp, unsigned int address);
+//dd TODO: moved to mesif.h void MessageToL2Cache(char BusOp, unsigned int Address);
 
 // Memory and Write Buffer Functions
 void ReadMemory(unsigned int address);

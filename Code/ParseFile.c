@@ -16,6 +16,7 @@ Description: 	This file contains:
 integer and returning the appropriate values to other functions.
 ================================================================================== */
 
+#include <stdio.h>
 #include "parse.h"
 #include "CacheSimulator.h"
 
