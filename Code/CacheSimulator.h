@@ -10,7 +10,8 @@ Date:			11/16/2014
 Author:			Carmen Ciobanu
 				Deborah Denhart
 				Jeremiah Franke
-Modified:		Deborah Denhart		12/02/14
+Modified:		Deborah Denhart		12/02/2014
+				Jeremiah Franke		12/04/2014
                 
 Description: 	This file contains:
 				- #defines
@@ -48,12 +49,12 @@ Description: 	This file contains:
 #define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
-#define EVICT_LINE						0
-#define CACHE_HIT						1
-#define CACHE_MISS					2
+#define EVICT_LINE			0
+#define CACHE_HIT			1
+#define CACHE_MISS			2
 
 // consts
-const int INPUT_BUFFER_SIZE = 100;
+#define INPUT_BUFFER_SIZE 100
 
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used
@@ -124,8 +125,8 @@ void InitParams();
 int ValidateInputs();
 
 // Commands Functions
-void ExecuteCommands02(unsigned int index, unsigned int tag);
-void ExecuteCommand1(unsigned int index, unsigned int tag);
+void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
+void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
 void ExecuteCommand3(unsigned int index, unsigned int tag);
 void ExecuteCommand4(unsigned int index, unsigned int tag);
 void ExecuteCommand5(unsigned int index, unsigned int tag);

@@ -5,10 +5,10 @@
 		Deborah Denhart
 		Jeremiah Franke
    ==================================================================================
-	File:				utility.c
+	File:			utility.c
 	Date:			11/16/2014
 	Author:			Carmen Ciobanu
-	Modified:		Jeremiah Franke
+	Modified:		Jeremiah Franke		12/04/2014
 					Deborah Denhart		12/02/14
 	Description:	This file contains: UTILITY FUNCTIONS
    ================================================================================== */
@@ -27,25 +27,18 @@
 /* ==================================================================================
 	Function name:	ParseAddress
  	Arguments:			unsigned int * address
- 	 	 	 	 				unsigned int * index
- 	 	 	 	 				unsigned int * tag
-	Returns:				void
-	Description:			Address processing function (bit shifting utility function)
+ 	 	 	 	 		unsigned int * index
+ 	 	 	 	 		unsigned int * tag
+	Returns:			void
+	Description:		Address processing function (bit shifting utility function)
    ================================================================================== */
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag)
 {
 	ConvertToBase(cacheStatistics.lineSize+33);
 	unsigned int numOffsetBits = ConvertToBase(cacheStatistics.lineSize);
-	//long double numOffsetBits = log2l(cacheStatistics.lineSize);
-	//unsigned long long int numOffsetBits = log2(cacheStatistics.lineSize);
-	//long double numIndexBits = log2l(cacheStatistics.numSets);
 	unsigned int numIndexBits = ConvertToBase(cacheStatistics.numSets);
-	//unsigned int numIndexBits = log2(cacheStatistics.numSets);
 	unsigned int addressSize = ADDR_SIZE;
-	//unsigned long long int addressSize = ADDR_SIZE;
-	//long double numTagBits = addressSize - (numOffsetBits + numIndexBits);
 	unsigned int numTagBits = addressSize - (numOffsetBits + numIndexBits);
-	//unsigned long long int numTagBits = addressSize - (numOffsetBits + numIndexBits);
 	printf("\n%d, %d, %d, %d",addressSize, numOffsetBits, numIndexBits, numTagBits);
 	*index = ((*address) << numTagBits) >> (numOffsetBits + numTagBits);
 	*tag = (*address) >> (numOffsetBits + numIndexBits);
@@ -493,15 +486,17 @@ int ValidateInputs()
 // ===========================================
 void ReadMemory(unsigned int address)
 {
-
+#ifdef SILENT
+	printf("Memory read from Address: %d\n", address);
+#endif
 }
-
 
 void WriteMemory(unsigned int address)
 {
-
+#ifdef SILENT
+	printf("Memory write to Address: %d", address);
+#endif
 }
-
 
 /* ===============================================================================
 takeLogBase2: Returns log base 2 of the input

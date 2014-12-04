@@ -8,7 +8,7 @@
    File:			CacheSimulator.c
    Date:            11/16/2014
    Author:			Carmen Ciobanu
-   Modified:		Jeremiah Franke
+   Modified:		Jeremiah Franke		12/04/2014
    Description: 	This file contains: main function
    ================================================================================== */
 
@@ -22,6 +22,7 @@
 #include <string.h>				// string handling
 #include "CacheSimulator.h"
 #include "parse.h"
+#include "output.h"
 
 
 /*   MAIN FUNCTION  */
