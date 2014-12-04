@@ -122,7 +122,7 @@ void delCache()
 }
 
 
-
+#ifdef 0
 /* ==================================================================================
 	Function name:	handleInputs
  	Arguments:		char* argv
@@ -206,31 +206,22 @@ void setCacheParams(long int *arg)
     cacheStatistics.numLines = cacheStatistics.numSets * cacheStatistics.associativity;	
 	cacheStatistics.cacheSize = cacheStatistics.numLines * cacheStatistics.lineSize ;	
 }
+#endif
 
-
-/* ==================================================================================
-	Function name:	flushCache
- 	Arguments:			
-	Returns:		void
-	Description:	initialize the cache
-================================================================================== */
-void flushCache()
-{
-	//flush all data held in the cache
-}
 
 
 /* ==================================================================================
-	Function name:	resetCache
- 	Arguments:			
-	Returns:		void
-	Description:	initialize the cache
+Function name:	MessageToL2Cache
+Arguments:		unsigned int
+Returns:		void
+Description:
 ================================================================================== */
-void resetCache()
+void MessageToL2Cache(unsigned int BusOp, unsigned int Address)
 {
-	//reset the cache to the max parameters
+#ifndef SILENT 
+	printf(“L2: %d %h\n”, BusOp, Address);
+#endif
 }
-
 	
 /*==================================================================================
 							 MATH FUNCTIONS
@@ -264,14 +255,14 @@ int ConvertToBase(int num)
 		return index;
 }
 
-//dd TODO: is ok to move to output.c?
+
 /* ==================================================================================
 	Function name:	OutputValidLines
  	Arguments:			void
 	Returns:				void
 	Description:			Output the contents and state of all valid lines in the cache
    ================================================================================== */
-/*void OutputValidLines()
+void OutputValidLines()
 {
 	unsigned int i, j, mesifState;
 	int valid;
@@ -301,7 +292,7 @@ int ConvertToBase(int num)
 			}
 	}
 }
-*/
+
 
 /* ==================================================================================
 	Function name:	OutputStatistics
@@ -355,20 +346,20 @@ void SetLineTag(unsigned int set, unsigned int line, unsigned int * tag)
 }
 
 
-//dd TODO: is ok to move to mesif.c?
 /* ==================================================================================
-	Function name:	GetMesifState
- 	Arguments:		unsigned int set = number of the set containing the desired line
- 	 	 	 	 	unsigned int line = number of the line we want to get the MESIF bits for
+	Function name:	UpdateMesif
+ 	Arguments:		unsigned int address - the address input from the trace file
+					unsigned int cmd - the command from the trace file
+					unsigned int set - number of the set containing the desired line
+ 	 	 	 	 	unsigned int line - number of the line we want to get the MESIF bits for
 	Returns:		void
-	Description:	Read the line MESIF state
+	Description:	Update the MESIF bits
    ================================================================================== */
-/*
-unsigned int GetMesifState(unsigned int set, unsigned int line)
+void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line)
 {
-		return cachePtr[set]->setPtr[line]->mesifBits;
+		
 }
-*/
+
 
 /* ==================================================================================
 	Function name:	CreateCache
@@ -497,27 +488,6 @@ int ValidateInputs()
 }
 
 
-// ==================================================================
-// MESIF functions - do we still need these, are we moving these to mesif.c ??? !!!!!!!!
-// ==================================================================
-//dd TODO: is ok to moved to mesif.h?
-/* MESIF functions
-void BusOperation(char BusOp, unsigned int Address, char * SnoopResult)
-{
-
-}
-
-char GetSnoopResult(unsigned int Address)
-{
-	return 0;
-
-}
-
-void PutSnoopResult(unsigned int Address, char SnoopResult)
-{
-
-}*/
-
  // ==========================================
 // Move to memory read/write and buffer file (???!!!!!!!!)
 // ===========================================
@@ -526,11 +496,13 @@ void ReadMemory(unsigned int address)
 
 }
 
+
 void WriteMemory(unsigned int address)
 {
 
 }
-*/
+
+
 /* ===============================================================================
 takeLogBase2: Returns log base 2 of the input
 

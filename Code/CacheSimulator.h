@@ -19,13 +19,6 @@ Description: 	This file contains:
 ================================================================================== */
 
 
-#include <stdint.h>				// for special data types like uint8_t, uint16_t
-#include <stdio.h>				// I/O library
-#include <ctype.h>				// useful for parsing
-#include <errno.h>				// error macros
-#include <math.h>				// basic match library
-#include <stdlib.h>				// general utilities
-
 // #defines
 // ---------
 #define TRUE 1
@@ -40,6 +33,7 @@ Description: 	This file contains:
 
 //dd TODO: should we use silent or debug? i am used to debug but faust uses silent...
 #define DEBUG				1
+#define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
 
 // Trace File Commands
@@ -61,7 +55,17 @@ Description: 	This file contains:
 // consts
 const int INPUT_BUFFER_SIZE = 100;
 
-
+//MESIF states
+//Invalid was chosen to be first in the enum list so that it could be also used
+//to initialize the bits
+enum Mesif_states {
+	eINVALID = 0, // Cache line is invalid
+	eMODIFIED = eINVALID + 1, // Only this cache has the line and the memory is stale
+	eEXCLUSIVE = eMODIFIED + 1, // Only this cache has the line and the memory is up to date 
+	eSHARED = eEXCLUSIVE + 1, // At least two other caches have the line and memory is up to date
+	eFORWARD = eSHARED + 1, // Cache line is in the shared state and this is the forwarding processor
+	eMAX_STATES = eFORWARD + 1
+};
 
 
 /*  DATA STRUCTURES  */
@@ -104,19 +108,14 @@ int * binarySearchArray;
 /*  FUNCTION PROTOTYPES  */
 // Utility Prototypes
 // ------------------
-//dd TODO: is it ok to add these?
-int initCache();
-void delCache();
-char* handleInputs(char **argv, int argc, char *filename);
-void setCacheParams(long int *arg);
-void flushCache();
-void resetCache();
+//char* handleInputs(char **argv, int argc, char *filename);
+//void setCacheParams(long int *arg);
 unsigned int takeLogBase2 (unsigned int vars);
 
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 int ConvertToBase(int num);
-//dd TODO: moved to output.h void OutputValidLines();
-//dd TODO: moved to mesif.h int GetMesifState(unsigned int set, unsigned int line);
+void OutputValidLines();
+void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line);
 unsigned int GetLineTag(unsigned int set, unsigned int line);
 void SetLineTag();
 int CreateCache();
@@ -141,7 +140,7 @@ int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bit
 int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, int * eviction);
 
 // Inclusion Function
-//dd TODO: moved to mesif.h void MessageToL2Cache(char BusOp, unsigned int Address);
+void MessageToL2Cache(char BusOp, unsigned int Address);
 
 // Memory and Write Buffer Functions
 void ReadMemory(unsigned int address);

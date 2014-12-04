@@ -23,37 +23,6 @@ Description: 	This file contains:
 
 
 
-
-/* ==================================================================================
-	Function name:	OutputValidLines
- 	Arguments:			void
-	Returns:				void
-	Description:			Output the contents and state of all valid lines in the cache
-   ================================================================================== */
-
-void OutputValidLines()
-{
-	unsigned int i, j;
-	unsigned int mesifState;
-	for(i = 0; i < cacheStatistics.numSets; ++i)
-	{
-		if(cachePtr[i].validLineCounter != 0)
-		{
-			for(j = 0; j < cacheStatistics.associativity; ++j)
-			{
-				/*
-				mesifState = GetMesifState(i, j);
-				if(mesifState != eINVALID)
-				{
-					printf();	// Print line contents and state
-				}		
-				*/			
-			}
-		}
-	}
-	
-}
-
 /* ===============================================================================
 printStatistics: prints accesses, hits, misses reads and writes
 
