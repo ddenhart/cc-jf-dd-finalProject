@@ -12,8 +12,8 @@
 					Deborah Denhart		12/02/14
 	Description:	This file contains: UTILITY FUNCTIONS
    ================================================================================== */
-//dd TODO: include these in c??
-/*#include <stdlib.h>
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -22,7 +22,7 @@
 #include "CacheSimulator.h"
 #include "mesif.h"
 #include "output.h"
-*/
+
 
 /* ==================================================================================
 	Function name:	ParseAddress

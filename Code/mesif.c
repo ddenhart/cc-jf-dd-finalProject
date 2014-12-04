@@ -12,6 +12,7 @@ File: 			mesif.c
 Date:			11/16/2014
 Author:			Deborah Denhart
 Modified:		Deborah Denhart		12/02/14
+				Deborah Denhart		12/03/14
 Description: 	This file contains:
 				- 
 	
@@ -20,11 +21,6 @@ Description: 	This file contains:
 #include <stdio.h>
 #include "mesif.h"
 #include "CacheSimulator.h"
-
-
-//enum Mesif_states current_state;
-//enum snoop_res snoop_event;
-//enum bus_ops bus_event;
 
 
 /* ===============================================================================
@@ -40,7 +36,7 @@ BusOperation:	Used to simulate a bus operation and to capture the
 ================================================================================== */
 void BusOperation(enum bus_ops BusOp, unsigned int Address, enum snoop_res *SnoopResult)
 {
-	#ifndef DEBUG
+	#ifndef SILENT
 		printf("BusOp:%d,Address:%h,SnoopResult:%d\n",*SnoopResult);
 	#endif
 
@@ -73,7 +69,7 @@ PutSnoopResult:	Used to report the result of our snooping bus
 ================================================================================== */
 void PutSnoopResult(unsigned int Address, enum snoop_res SnoopResult)
 {
-	#ifndef DEBUG 
+#ifndef SILENT 
 		printf(“SnoopResult: Address %h, SnoopResult: %d\n”, Address,SnoopResult); 
 	#endif 
 }
@@ -90,7 +86,7 @@ MessageToL2Cache:	Used to simulate communication to our upper level cache
 ================================================================================== */
 void MessageToL2Cache(enum bus_ops BusOp, unsigned int Address)
 {
-	#ifndef DEBUG 
+#ifndef SILENT 
 		printf(“L2: %d %h\n”, BusOp, Address); 
 	#endif
 }

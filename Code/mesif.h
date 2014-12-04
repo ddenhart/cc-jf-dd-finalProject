@@ -19,10 +19,6 @@ Description: 	This file contains:
 
 #define MAX_STATE_COMBO 3;
 
-//MESIF states
-//Invalid was chosen to be first in the enum list so that it could be also used
-//to initialize the bits
-enum Mesif_states { eINVALID  = 0, // Cache line is invalid					eMODIFIED = eINVALID +1, // Only this cache has the line and the memory is stale					eEXCLUSIVE = eMODIFIED +1, // Only this cache has the line and the memory is up to date 					eSHARED = eEXCLUSIVE +1, // At least two other caches have the line and memory is up to date					eFORWARD = eSHARED + 1, // Cache line is in the shared state and this is the forwarding processor					eMAX_STATES = eFORWARD +1 };
 // Bus operation typesenum bus_ops { eINVALIDATE = 10, // Bus Invalidate
 			   eREAD = eINVALIDATE +1, // Bus Read
 			   eWRITE = eREAD +1, // Bus Write

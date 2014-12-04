@@ -10,7 +10,14 @@
 	Author:			Carmen Ciobanu
 	Description:	This file contains one function for each command 0-9
    ================================================================================== */
-   
+// # includes  
+#include <stdint.h>				// for special data types like uint8_t, uint16_t 
+#include <stdio.h>				// I/O library
+#include <ctype.h>				// useful for parsing
+#include <errno.h>				// error macros
+#include <math.h>				// basic match library
+#include <stdlib.h>				// general utilities
+#include <string.h>				// string handling
 #include "CacheSimulator.h" 
 
 
