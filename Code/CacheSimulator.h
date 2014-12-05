@@ -144,7 +144,7 @@ int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bit
 int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, int * eviction);
 
 // Inclusion Function
-void MessageToL2Cache(char BusOp, unsigned int Address);
+void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned int evictedLineAddr);
 
 // Memory and Write Buffer Functions
 void ReadMemory(unsigned int address);

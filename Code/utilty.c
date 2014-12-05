@@ -338,6 +338,7 @@ void ReadMemory(unsigned int address)
 {
 	// TODO cc changed to ifndef SILENT because we don't want output when SILENT
 	// TODO cc changed address to be output in hex
+	// TODO I don't think we should send the entire address to memory (we can 0 out the last 5 bits for 32 byte lines, 6 bits for 64 byte lines etc.)
 #ifndef SILENT
 	printf("Memory read from Address: %#x\n", address);
 #endif
@@ -347,6 +348,7 @@ void WriteMemory(unsigned int address)
 {
 	// TODO cc changed to ifndef SILENT because we don't want output when SILENT
 	// TODO cc changed address to be output in hex
+	// TODO I don't think we should send the entire address to memory (we can 0 out the last 5 bits for 32 byte lines, 6 bits for 64 byte lines etc.)
 #ifndef SILENT
 	printf("Memory write to Address: %#x", address);
 #endif
