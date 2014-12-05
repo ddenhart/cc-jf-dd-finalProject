@@ -30,71 +30,50 @@
 	Description:
    ================================================================================== */
 
-void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
-{
-	// TODO Jeremiah, cacheStatistics.numLines must be replaced with cacheStatistics.associativity
-	// TODO Jeremiah, change the way UpdateLRU is called
-	// TODO Jeremiah, add extra variables needed to LRU
-	// TODO Jeremiah, remove duplicate code from command functions
+//TODO JF: Get the Update Mesif state function from Deb
+//TODO JF: Write the victim cache
 
-	int validLines[INPUT_BUFFER_SIZE];
-	int invalidLines[INPUT_BUFFER_SIZE];
-	int invalidLength = 0;
-	int validLength = 0;
+int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
+{
+	int cacheLine = 0;
+	int max = cacheStatistics.associativity - 1;
+	int min = 0;
+	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int eviction = 0;
 
-	for (int setCount = 0; setCount < cacheStatistics.numLines; ++setCount)
+	for (int setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
-		if (cachePtr[index].setPtr[setCount].mesifBits != eINVALID)
+		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
-			if (tag == cachePtr[index].setPtr[setCount].tagBits)
-			{
-				++cacheStatistics.numHits;
-				++cacheStatistics.numAccesses;
-				++cacheStatistics.numReads;
-				cacheHit = TRUE;
-				updateMesifState(index, tag);
-				UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_HIT, &eviction);  // TODO: JF: Is the 0 and cacheStatistics.numLines correct Carmen?
-				printf("Sending %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
-				break;
-			}
-			else
-			{
-				validLines[validLength] = setCount;  //TODO: JF: These might not be necessary.
-				++validLength;
-			}
-		}
-		else  //Invalid lines
-		{
-			invalidLines[invalidLength] = setCount;
-			++invalidLength;
-		}
-		if (setCount == (cacheStatistics.numLines - 1) && !cacheHit)
-		{
-			++cacheStatistics.numMisses;
+			flag = CACHE_HIT;
+			++cacheStatistics.numHits;
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
-			//Add command = 2 -> Why?
-			ReadMemory(HexAddress);
-			if (invalidLength > 0)  //At least one line is invalid
-			{
-				// Get snoop result
-				// If hit, read from bus
-				// If not read from memory
-				// Set the Mesif state for the line here
-				cachePtr[index].setPtr[invalidLines[0]].tagBits = tag;
-			}
-			else  //All lines filled, one needs to be evicted.
-			{
-				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_MISS, &eviction);
-				cachePtr[index].setPtr[evictedLine].tagBits = tag;
-				//Put evicted line into Victim Cache.
-			}
+			cacheLine = setCount;
+			//updateMesifState(index, tag);  Update the MESIF State
+			// MessageToL2();
+			//printf("Reading %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
+			break;
 		}
 	}
+	cacheLine = UpdateLRU(index, cacheLine, min, max, flag, &eviction);
+	if (cacheLine < 0)
+		return -1;
+	else if (flag == CACHE_MISS)
+	{
+		++cacheStatistics.numMisses;
+		++cacheStatistics.numAccesses;
+		++cacheStatistics.numReads;
+		if (cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)
+		{
+			//TODO JF: Put evicted line into Victim Cache;
+		}
+		cachePtr[index].setPtr[cacheLine].tagBits = tag;
+		ReadMemory(HexAddress);
+	}
 	printf("\nTest\n");
-	// TO DO
+	return 0;
 }
 
 
@@ -104,76 +83,47 @@ void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAdd
 	Returns:
 	Description:
    ================================================================================== */
-void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress)
-{
-	// TODO Jeremiah, cacheStatistics.numLines must be replaced with cacheStatistics.associativity
-	// TODO Jeremiah, change the way UpdateLRU is called
-	// TODO Jeremiah, add extra variables needed to LRU
-	// TODO Jeremiah, remove duplicate code from command functions
-
-	int validLines[INPUT_BUFFER_SIZE];
-	int invalidLines[INPUT_BUFFER_SIZE];
-	int invalidLength = 0;
-	int validLength = 0;
+int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress)
+{	
+	int cacheLine = 0;
+	int max = cacheStatistics.associativity - 1;
+	int min = 0;
+	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int eviction = 0;
 
-	for (int setCount = 0; setCount < cacheStatistics.numLines; ++setCount)
+	for (int setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
-		if (cachePtr[index].setPtr[setCount].mesifBits != eINVALID)
+		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
-			if (tag == cachePtr[index].setPtr[setCount].tagBits)
-			{
-				++cacheStatistics.numHits;
-				++cacheStatistics.numAccesses;
-				++cacheStatistics.numReads;
-				cacheHit = TRUE;
-				updateMesifState(index, tag);
-				UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_HIT, &eviction);  // TODO: JF: Is the 0 and cacheStatistics.numLines correct Carmen?
-				printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
-				break;
-			}
-			else
-			{
-				validLines[validLength] = setCount;  //TODO: JF: These might not be necessary.
-				++validLength;
-			}
-		}
-		else  //Invalid lines
-		{
-			invalidLines[invalidLength] = setCount;
-			++invalidLength;
-		}
-		if (setCount == (cacheStatistics.numLines - 1) && !cacheHit)
-		{
-			++cacheStatistics.numMisses;
+			flag = CACHE_HIT;
+			++cacheStatistics.numHits;
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
-			//Add command = 2 -> Why?
-			ReadMemory(HexAddress);
-			if (invalidLength > 0)  //At least one line is invalid
-			{
-				// Get snoop result
-				// If hit, read from bus
-				// If not read from memory
-				// Set the Mesif state for the line here
-				cachePtr[index].setPtr[invalidLines[0]].tagBits = tag;
-			}
-			else  //All lines filled, one needs to be evicted.
-			{
-				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_MISS, &eviction);
-				if (cachePtr[index].setPtr[evictedLine].mesifBits == eMODIFIED)
-				{
-					//TODO: JF: Put evicted line into Victim Cache.
-				}
-				cachePtr[index].setPtr[evictedLine].tagBits = tag;
-				WriteMemory(HexAddress);
-				//TODO: JF: Send message for multiple lines to L2 to evict its addresses, do the math for starting/stopping addresses in the function
-			}
+			cacheLine = setCount;
+			//updateMesifState(index, tag);  Update the MESIF state.
+			// MessageToL2();
+			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
+			break;
 		}
 	}
+	cacheLine = UpdateLRU(index, cacheLine, min, max, flag, &eviction);
+	if (cacheLine < 0)
+		return -1;
+	else if (flag == CACHE_MISS)
+	{
+		++cacheStatistics.numMisses;
+		++cacheStatistics.numAccesses;
+		++cacheStatistics.numReads;
+		if (cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)
+		{
+			//TODO JF: Put evicted line into Victim Cache;
+		}
+		cachePtr[index].setPtr[cacheLine].tagBits = tag;
+		WriteMemory(HexAddress);
+	}
+	return 0;
 	printf("\nCommand 1\n");
-	// TO DO
 }
 
 
@@ -255,7 +205,7 @@ void ExecuteCommand8()
    ================================================================================== */
 void ExecuteCommand9()
 {
-	OutputValidLines();
+	//OutputValidLines();
 }
 
 

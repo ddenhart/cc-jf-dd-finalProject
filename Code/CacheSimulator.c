@@ -75,7 +75,9 @@ int main(int argc, char * argv[])
     }
 	
 	// Parse trace file and execute commands
-	ParseFile(filename);
+	returnValue = ParseFile(filename);
+	if (returnValue < 0)
+		return 1;
 	
 	// Calculate cache hit ratio
 	cacheStatistics.hitRatio = cacheStatistics.numHits / cacheStatistics.numAccesses;

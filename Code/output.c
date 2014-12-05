@@ -20,6 +20,7 @@ Description: 	This file contains:
 #include <math.h>
 #include "output.h"
 #include "CacheSimulator.h"
+#include "mesif.h"
 
 
 // TODO please select one of printStatistics()+printSettings and OutputStatistics()
@@ -109,6 +110,7 @@ void OutputStatistics()
 	Returns:				void
 	Description:			Output the contents and state of all valid lines in the cache
    ================================================================================== */
+/*
 void OutputValidLines()
 {
 	unsigned int i, j, mesifState;
@@ -138,4 +140,5 @@ void OutputValidLines()
 				printf("\nSet %u  LRU %#x\n\n", i, cachePtr[i].plruBits);
 			}
 	}
-}
+} 
+*/

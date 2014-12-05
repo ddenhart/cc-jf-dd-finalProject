@@ -21,7 +21,7 @@ integer and returning the appropriate values to other functions.
 #include "parse.h"
 #include "CacheSimulator.h"
 
-void ParseFile(char * Filename)
+int ParseFile(char * Filename)
 {
 	/* While not EOF
 	-----------------
@@ -40,8 +40,6 @@ void ParseFile(char * Filename)
 	int counter = 0;
 	int isSpace = 0;
 
-	// Open file and do error check
-	// ----------------------------
 	traceFile = fopen(Filename, "r");
 	if (traceFile == NULL)
 	{
@@ -61,7 +59,9 @@ void ParseFile(char * Filename)
 		if (characterInLine == '\n')
 		{
 			lineHolder[counter] = '\0';
-			ProgramWrapper(lineHolder, operation);
+			int returnValue = ProgramWrapper(lineHolder, operation);
+			if (returnValue < 0)
+				return -1;
 			isSpace = 0;
 			continue;
 		}
@@ -77,31 +77,29 @@ void ParseFile(char * Filename)
 			lineHolder[counter] = characterInLine;
 		++counter;
 	}
-	// Close file
-	// ----------
 	fclose(traceFile);
-	return;
+	return 0;
 }
 
-void ProgramWrapper(char * HexAddress, unsigned int operation)
+int ProgramWrapper(char * HexAddress, unsigned int operation)
 {
 	unsigned int tag = 0;
 	unsigned int index = 0;
 
 	ParseHexAddress(HexAddress, &tag, &index);
-	CommandCentral(tag, index, operation, HexAddress);
+	return CommandCentral(tag, index, operation, HexAddress);
 }
 
-void CommandCentral(unsigned int tag, unsigned int index, unsigned int operation, char * HexAddress)
+int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation, char * HexAddress)
 {
 	switch (operation)
 	{
 	case INSTR_READ_REQ:
 	case DATA_READ_REQ:
-		ExecuteCommands02(index, tag, HexAddress);
+		return ExecuteCommands02(index, tag, HexAddress);
 		break;
 	case DATA_WRITE_REQ:
-		ExecuteCommand1(index, tag, HexAddress);
+		return ExecuteCommand1(index, tag, HexAddress);
 		break;
 	case SNOOPED_INVALIDATE:
 		ExecuteCommand3(index, tag);

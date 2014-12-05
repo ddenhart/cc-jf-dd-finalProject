@@ -54,11 +54,12 @@ Description: 	This file contains:
 #define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
-#define CACHE_HIT				1
+#define CACHE_HIT			1
 #define CACHE_MISS			0
 
 // consts
 #define INPUT_BUFFER_SIZE 100
+//#define ALWAYS				1  //For the two utility prototypes.
 
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used
@@ -127,8 +128,8 @@ void InitParams();
 int ValidateInputs();
 
 // Commands Functions
-void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
-void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
+int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
+int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
 void ExecuteCommand3(unsigned int index, unsigned int tag);
 void ExecuteCommand4(unsigned int index, unsigned int tag);
 void ExecuteCommand5(unsigned int index, unsigned int tag);
