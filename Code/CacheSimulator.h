@@ -12,6 +12,7 @@ Author:			Carmen Ciobanu
 				Jeremiah Franke
 Modified:		Deborah Denhart		12/02/2014
 				Jeremiah Franke		12/04/2014
+			Carmen Ciobanu		12/04/2014
                 
 Description: 	This file contains:
 				- #defines
@@ -25,6 +26,7 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
+//cc TODO these parameters are not correct, see function "validateInputs" for correct values of all params
 // default cache parameters - set to max available?
 #define WORD_SIZE 8
 #define MAX_CAPACITY (8 * 1024 * 1024)
@@ -33,6 +35,9 @@ Description: 	This file contains:
 #define LINES_SIZE 64
 
 //dd TODO: should we use silent or debug? i am used to debug but faust uses silent...
+//cc DEBUG and SILENT are different and we need both
+//cc DEBUG is just for us to print whatever for debug
+//cc SILENT is for suppressing all output except for statistics
 #define DEBUG				1
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
@@ -49,9 +54,8 @@ Description: 	This file contains:
 #define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
-#define EVICT_LINE			0
-#define CACHE_HIT			1
-#define CACHE_MISS			2
+#define CACHE_HIT				1
+#define CACHE_MISS			0
 
 // consts
 #define INPUT_BUFFER_SIZE 100
@@ -112,10 +116,8 @@ int * binarySearchArray;
 //char* handleInputs(char **argv, int argc, char *filename);
 //void setCacheParams(long int *arg);
 unsigned int takeLogBase2 (unsigned int vars);
-
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 int ConvertToBase(int num);
-void OutputValidLines();
 void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line);
 unsigned int GetLineTag(unsigned int set, unsigned int line);
 void SetLineTag();

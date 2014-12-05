@@ -21,6 +21,7 @@
 #include <string.h>				// string handling
 #include "CacheSimulator.h" 
 #include "mesif.h"
+#include "output.h"
 
 /* ==================================================================================
 	Function name:	ExecuteCommands02
@@ -28,8 +29,14 @@
 	Returns:
 	Description:
    ================================================================================== */
+
 void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
+	// TODO Jeremiah, cacheStatistics.numLines must be replaced with cacheStatistics.associativity
+	// TODO Jeremiah, change the way UpdateLRU is called
+	// TODO Jeremiah, add extra variables needed to LRU
+	// TODO Jeremiah, remove duplicate code from command functions
+
 	int validLines[INPUT_BUFFER_SIZE];
 	int invalidLines[INPUT_BUFFER_SIZE];
 	int invalidLength = 0;
@@ -80,7 +87,7 @@ void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAdd
 			}
 			else  //All lines filled, one needs to be evicted.
 			{
-				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, EVICT_LINE, &eviction);
+				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_MISS, &eviction);
 				cachePtr[index].setPtr[evictedLine].tagBits = tag;
 				//Put evicted line into Victim Cache.
 			}
@@ -99,6 +106,11 @@ void ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAdd
    ================================================================================== */
 void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
+	// TODO Jeremiah, cacheStatistics.numLines must be replaced with cacheStatistics.associativity
+	// TODO Jeremiah, change the way UpdateLRU is called
+	// TODO Jeremiah, add extra variables needed to LRU
+	// TODO Jeremiah, remove duplicate code from command functions
+
 	int validLines[INPUT_BUFFER_SIZE];
 	int invalidLines[INPUT_BUFFER_SIZE];
 	int invalidLength = 0;
@@ -149,7 +161,7 @@ void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddre
 			}
 			else  //All lines filled, one needs to be evicted.
 			{
-				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, EVICT_LINE, &eviction);
+				int evictedLine = UpdateLRU(index, tag, 0, cacheStatistics.numLines, CACHE_MISS, &eviction);
 				if (cachePtr[index].setPtr[evictedLine].mesifBits == eMODIFIED)
 				{
 					//TODO: JF: Put evicted line into Victim Cache.
@@ -173,7 +185,7 @@ void ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddre
    ================================================================================== */
 void ExecuteCommand3(unsigned int index, unsigned int tag)
 {
-	// TO DO
+	// TODO
 }
 
 
@@ -185,7 +197,7 @@ void ExecuteCommand3(unsigned int index, unsigned int tag)
    ================================================================================== */
 void ExecuteCommand4(unsigned int index, unsigned int tag)
 {
-	// TO DO
+	// TODO
 }
 
 
@@ -197,7 +209,7 @@ void ExecuteCommand4(unsigned int index, unsigned int tag)
    ================================================================================== */
 void ExecuteCommand5(unsigned int index, unsigned int tag)
 {
-	// TO DO
+	// TODO
 }
 
 
@@ -209,7 +221,7 @@ void ExecuteCommand5(unsigned int index, unsigned int tag)
    ================================================================================== */
 void ExecuteCommand6(unsigned int index, unsigned int tag)
 {
-	// TO DO
+	// TODO
 }
 
 
@@ -217,7 +229,7 @@ void ExecuteCommand6(unsigned int index, unsigned int tag)
 	Function name:	ExecuteCommand8
  	Arguments:
 	Returns:
-	Description:			Clear cache and invalidate all lines and reset all states
+	Description:			Clear cache / Invalidate all lines
    ================================================================================== */
 void ExecuteCommand8()
 {
@@ -225,11 +237,11 @@ void ExecuteCommand8()
 
 	for(i = 0; i < cacheStatistics.numSets ; ++i)
 	{
-		cachePtr[i].plruBits = 0;
+		//TODO Do you think LRU should retain state on clear, or not?
+		//cachePtr[i].plruBits = 0;
 		for(j = 0; j < cacheStatistics.associativity; ++i)
 		{
 			cachePtr[i].setPtr[j].mesifBits = 0;
-			cachePtr[i].setPtr[j].tagBits = 0;
 		}
 	}
 }
@@ -243,7 +255,7 @@ void ExecuteCommand8()
    ================================================================================== */
 void ExecuteCommand9()
 {
-	//OutputValidLines();
+	OutputValidLines();
 }
 
 

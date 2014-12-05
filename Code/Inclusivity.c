@@ -29,7 +29,10 @@
    ================================================================================== */
 void MessageToL2Cache(char BusOp, unsigned int address)
 {
-	// TO DO
+	// TODO
+#ifndef SILENT
+	printf("L2: %d %h\n", BusOp, Address);
+#endif
 }
 
 

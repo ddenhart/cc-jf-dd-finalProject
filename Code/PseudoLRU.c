@@ -49,37 +49,34 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 		return -1; 
 	}
 
-	// If the request was made due to a cache hit or a miss due to an invalid line, write LRU bits (no need to read)
-	if((flag == CACHE_HIT) || (flag == CACHE_MISS ))
+	// If the request was made due to a cache hit, write LRU bits (no need to read bits first)
+	if(flag == CACHE_HIT)
 	{
 		if((errorCode = SetPseudoLRU(set, line, min, max)) == -1)
 		{
 			return -1;
 		}
-		else
-		{
-			*eviction = FALSE;
-			evictedLine = 0;
-		}
+
+		*eviction = FALSE;
+		evictedLine = 0;
 	}
-	// If the request was made due to a cache miss, find an invalid line to bring in new line or find line to evict if and write LRU bits
-	else if(flag == EVICT_LINE)
+	// If the request was made due to a cache miss, find an invalid line to bring in new line or find line to evict and write LRU bits
+	else if(flag == CACHE_MISS)
 	{	
 		int i;
 		unsigned int mesifState;
-
 
 		// First of all, search for remaining invalid lines in the set
 		for(i = 0; i < cacheStatistics.associativity; ++i)
 		{
 			mesifState = cachePtr[set].setPtr[i].mesifBits;
-			if(mesifState == 0)
+			if(mesifState == eINVALID)
 			{
 				evictedLine = i;
 				if((errorCode = SetPseudoLRU(set, evictedLine, min, max)) == -1)
-					{
+				{
 						return -1;
-					}
+				}
 				*eviction = FALSE;	// No, we did not evict a line, since we had an invalid line available
 				return evictedLine;
 			}
@@ -107,7 +104,8 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 				return -1;
 			}
 		}
-		*eviction = TRUE;		// Yes, we ended up evicting a line
+
+		*eviction = TRUE;		// Yes, we need to evict a line
 	}
 	// If flag is bogus, report error and terminate program
 	else
