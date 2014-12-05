@@ -26,13 +26,7 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
-//cc TODO these parameters are not correct, see function "validateInputs" for correct values of all params
-// default cache parameters - set to max available?
-#define WORD_SIZE 8
-#define MAX_CAPACITY (8 * 1024 * 1024)
-#define BLOCK_SIZE 8
-#define MAX_ASSOCIATIVITY 16
-#define LINES_SIZE 64
+
 
 //dd TODO: should we use silent or debug? i am used to debug but faust uses silent...
 //cc DEBUG and SILENT are different and we need both
@@ -54,6 +48,7 @@ Description: 	This file contains:
 #define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
+#define EVICT_LINE			0
 #define CACHE_HIT			1
 #define CACHE_MISS			0
 

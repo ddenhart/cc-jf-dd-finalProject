@@ -45,7 +45,7 @@ void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * t
 }
 
 
-#ifdef ALWAYS
+#if 0
 /* ==================================================================================
 	Function name:	handleInputs
  	Arguments:		char* argv
