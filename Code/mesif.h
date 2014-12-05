@@ -18,64 +18,107 @@ Description: 	This file contains:
 ================================================================================== */
 
 #define MAX_STATE_COMBO 3;
+#define CPU_CODE_ROWS 8;
+#define SYS_CODE_ROWS 9;
 
 // Bus operation types
-enum proc_res { ePR_READ = 10, // Bus Read
-				ePR_WRITE = ePR_READ + 1, // Bus Write
+enum cpu_bus { 
+        eCB_READ = 10, // Bus Read
+        eCB_WRITE = eCB_READ + 1, // Bus Write
 
-				ePR_NOHIT = ePR_WRITE + 1,
-				ePR_HIT = ePR_NOHIT + 1,
+        eCB_NOHIT = eCB_WRITE + 1,
+        eCB_HIT = eCB_NOHIT + 1,
 
-				ePR_MEMREAD = ePR_HIT + 1,
-				ePR_RFO = ePR_MEMREAD + 1,
-				ePR_INVALIDATE = ePR_RFO +1, // Bus Invalidate
+        eCB_MEMREAD = eCB_HIT + 1,
+        eCB_RFO = eCB_MEMREAD + 1,
+        eCB_INVALIDATE = eCB_RFO +1, // Bus Invalidate
 
-				ePR_DONTCARE = ePR_INVALIDATE + 1,
-				ePR__MAX_EVENTS = ePR_DONTCARE + 1
+        eCB_DONTCARE = eCB_INVALIDATE + 1,
+        eCB__MAX_EVENTS = eCB_DONTCARE + 1
 };
 
 
 // Snoop result types
-enum snoop_res {eSR_RFO = 20,
-				eSR_READ = eSR_RFO + 1,
+enum system_bus {
+        eSB_RFO = 20,
+        eSB_READ = eSB_RFO + 1,
 	
-				eSR_HIT = eSR_READ +1, // Hit
-				eSR_HITM = eSR_HIT + 1, // Hit to a modified line
+        eSB_HIT = eSB_READ +1, // Hit
+        eSB_HITM = eSB_HIT + 1, // Hit to a modified line
 
-				eSR_WRITEBACK = eSR_HITM + 1,
-				eSR_FORWARD = eSR_WRITEBACK + 1,
+        eSB_WRITEBACK = eSB_HITM + 1,
+        eSB_FORWARD = eSB_WRITEBACK + 1,
 
-				eSR_DONTCARE = eSR_FORWARD + 1,
-				eSR_MAX_EVENTS = eSR_DONTCARE + 1
+        eSB_DONTCARE = eSB_FORWARD + 1,
+        eSB_MAX_EVENTS = eSB_DONTCARE + 1
 };
 
-//MESIF Error codes
-enum mesif_err { eNO_ERROR = 0,
-				 eINVALID_STATE_ERROR = -100,
-				 eFLAG_ERROR = -110,
-				 eProc_ERROR = -200,
-				 eSNOOP_ERROR = -300,
-				 eSYNTAX_NULL_ERROR = -400 };
 
-enum mesif_type{ eProc = 0,
-				 eSnoop = 1 };
+enum eventColumn
+{
+    eCOL_1 = 0,
+    eCOL_2 = eCOL_1 + 1,
+    eCOL_3 = eCOL_2 + 1,
+    eCOL_MAX = eCOL_3 +1
+};
+
+
+//MESIF Error codes
+enum mesif_err { 
+        eNO_ERROR = 0,
+	     eINVALID_STATE_ERROR = -100,    //the state machine has an unassigned state
+	     eFLAG_ERROR = -110,             //the bus has an unassigned sender
+        eINVALID_COLUMN_ERROR = -120,   //the column combination of events is unassigned
+	     eCBUS_ERROR = -200,             //there is an unassigned cpu bus event
+	     eSBUS_ERROR = -300,             //there is an unassigned system bus event 
+	     eSYNTAX_NULL_ERROR = -400       //a null pointer was found
+};
+
+enum mesif_type{ 
+        eCBUS = 0,
+        eSBUS = 1 };
+
+unsigned int valid_CPU_Codes[CPU_CODE_ROWS][eCOL_MAX] = {
+        {eCB_READ, eCB_HIT, eCB_MEMREAD},
+        {eCB_READ, eCB_NOHIT, eCB_MEMREAD},
+        {eCB_WRITE, eCB_DONTCARE, eCB_RFO},
+        {eCB_WRITE, eCB_DONTCARE, eCB_DONTCARE},
+        {eCB_READ, eCB_DONTCARE, eCB_DONTCARE}, 
+        {eCB_WRITE, eCB_DONTCARE, eCB_RFO},
+        {eCB_WRITE, eCB_DONTCARE, eCB_INVALIDATE},
+        {eCB_WRITE, eCB_DONTCARE, eCB_DONTCARE}
+};
+
+unsigned int valid_SYS_Codes[SYS_CODE_ROWS][eCOL_MAX] = {
+        {eSB_DONTCARE, eSB_DONTCARE, eSB_DONTCARE},
+        {eSB_RFO, eSB_DONTCARE, eSB_DONTCARE},
+        {eSB_RFO, eSB_HIT, eSB_FORWARD},
+        {eSB_READ, eSB_HIT, eSB_FORWARD},
+        {eSB_RFO, eSB_HITM, eSB_WRITEBACK},
+        {eSB_READ, eSB_HITM, eSB_WRITEBACK},
+        {eSB_RFO, eSB_HIT, eSB_FORWARD},
+        {eSB_READ, eSB_HIT, eSB_FORWARD},
+        {eSB_READ, eCB_DONTCARE, eCB_DONTCARE}
+};
+
 
 struct sMesif {
 	enum Mesif_states current_state;
-	enum proc_res bus[eSR_MAX_EVENTS];
-	enum snoop_res snoop[eSR_MAX_EVENTS];
+	enum cpu_bus bus[eSB_MAX_EVENTS];
+	enum system_bus snoop[eSB_MAX_EVENTS];
 	enum mesif_err eERROR;
 };
 
+
 // Used to simulate a bus operation and to capture the 
 // snoop results of last level caches of other processors
-void BusOperation(enum proc_res BusOp, unsigned int Address, enum snoop_res *SnoopResult);
+void BusOperation(enum cpu_bus BusOp, unsigned int Address, enum system_bus *SnoopResult);
 
 // Used to simulate the reporting of snoop results by other caches
-enum snoop_res GetSnoopResult(unsigned int Address);
+enum system_bus GetSnoopResult(unsigned int Address);
 
 // Used to report the result of our snooping bus operations by other caches  
-void PutSnoopResult(unsigned int Address, enum snoop_res SnoopResult); 
+void PutSnoopResult(unsigned int Address, enum system_bus SnoopResult); 
 
 //Read the line MESIF state
 unsigned int GetMesifState(unsigned int set, unsigned int line);
@@ -86,20 +129,22 @@ enum Mesif_states nextCPUState(enum Mesif_states eState);
 // Get the current state of a line
 enum Mesif_states nextSnoopState(enum Mesif_states eState);
 
-enum proc_res nextBusEvent(enum Mesif_states current_state);
+enum cpu_bus nextBusEvent ( enum Mesif_states current_state );
 
 // Get the latest bus event
-enum proc_res getBusEvent();
+enum cpu_bus getBusEvent ( );
 
-enum snoop_res nextSnoopEvent(enum Mesif_states current_state);
+enum system_bus nextSnoopEvent ( enum Mesif_states current_state );
 
 // Get the latest snoop event
-enum snoop_res getSnoopEvent();
+enum system_bus getSnoopEvent();
 
 
-enum proc_res busStateSelect(enum Mesif_states eCurrent, int *iEventCode);
-enum snoop_res snoopStateSelect(enum Mesif_states eCurrent, int *iEventCode);
+int busStateSelect(enum mesif_type eFlag, int iRow);
+enum system_bus snoopStateSelect(enum mesif_type eFlag, int iRow);
 
+enum mesif_err eventCodeCheck(enum mesif_type eFlag, int *iEventCode);
+int compareCodes(enum mesif_type eFlag, int *iEventCode);
 
 //function prototypes for each action 
 enum mesif_err actionM_Read(enum mesif_type eFlag, int *iEventCode);
@@ -152,7 +197,6 @@ enum mesif_err actionF_HITM(enum mesif_type eFlag, int *iEventCode);
 enum mesif_err actionF_RFO(enum mesif_type eFlag, int *iEventCode);
 enum mesif_err actionF_MEMREAD(enum mesif_type eFlag, int *iEventCode);
 
-void action_doNothing();
 
 
 
