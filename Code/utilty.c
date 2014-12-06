@@ -223,21 +223,6 @@ void SetLineTag(unsigned int set, unsigned int line, unsigned int * tag)
 
 
 /* ==================================================================================
-	Function name:	UpdateMesif
- 	Arguments:		unsigned int address - the address input from the trace file
-					unsigned int cmd - the command from the trace file
-					unsigned int set - number of the set containing the desired line
- 	 	 	 	 	unsigned int line - number of the line we want to get the MESIF bits for
-	Returns:		void
-	Description:	Update the MESIF bits
-   ================================================================================== */
-void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line)
-{
-		
-}
-
-
-/* ==================================================================================
 	Function name:	CreateCache
  	Arguments:
 	Returns:		void
