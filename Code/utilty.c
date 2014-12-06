@@ -45,6 +45,39 @@ void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * t
 }
 
 
+/* ==================================================================================
+	Function name: GetLineAddress
+ 	Arguments:        unsigned int address for trace file address
+	Returns:             unsigned int for beginning of the cache line address
+	Description:        Gets the beginning of the cache line address, from the trace file address
+   ================================================================================== */
+unsigned int GetLineAddress(unsigned int address)
+{
+	unsigned int numOffsetBits, mask, i;
+
+	mask = 0;
+	numOffsetBits = ConvertToBase(cacheStatistics.lineSize);
+	mask = ~mask;
+
+	for(i = 0; i < numOffsetBits; ++i)
+	{
+		mask &= ~(1 << i);
+	}
+
+#ifdef DEBUG
+	printf("Original address(byte address) = %#x\n", address);
+#endif
+
+	address &= mask;
+
+#ifdef DEBUG
+	printf("Address of the beginning of the line = %#x\n", address);
+#endif
+
+	return address;
+}
+
+
 #if 0
 /* ==================================================================================
 	Function name:	handleInputs
@@ -336,9 +369,7 @@ int ValidateInputs()
 // ===========================================
 void ReadMemory(unsigned int address)
 {
-	// TODO cc changed to ifndef SILENT because we don't want output when SILENT
-	// TODO cc changed address to be output in hex
-	// TODO I don't think we should send the entire address to memory (we can 0 out the last 5 bits for 32 byte lines, 6 bits for 64 byte lines etc.)
+	// TODO Call GetLineAddress() before sending the address; new address is return value
 #ifndef SILENT
 	printf("Memory read from Address: %#x\n", address);
 #endif
@@ -346,9 +377,7 @@ void ReadMemory(unsigned int address)
 
 void WriteMemory(unsigned int address)
 {
-	// TODO cc changed to ifndef SILENT because we don't want output when SILENT
-	// TODO cc changed address to be output in hex
-	// TODO I don't think we should send the entire address to memory (we can 0 out the last 5 bits for 32 byte lines, 6 bits for 64 byte lines etc.)
+	// TODO Call GetLineAddress() before sending the address; new address is return value
 #ifndef SILENT
 	printf("Memory write to Address: %#x", address);
 #endif

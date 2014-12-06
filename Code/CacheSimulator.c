@@ -42,10 +42,11 @@ int main(int argc, char * argv[])
 	*/
 	
 	if(argc != 5)
-	{
-		fprintf(stderr, "Usage: %s	#Sets	Line size in bytes		Associativity		Trace file name\n", argv[0]);
-		return 1;
-	}
+		{
+			// TODO research changing SILENT from command line
+			fprintf(stderr, "Usage: %s	#Sets (1 to 65535)   Line size in bytes (32 to 2048, power of 2)   Associativity (4 to 32, power of 2)   Trace file name (< filename.txt >)\n", argv[0]);
+			return 1;
+		}
 	
 	// Store command line arguments
 	arg1 = atoll(argv[1]);

@@ -187,11 +187,9 @@ void ExecuteCommand8()
 
 	for(i = 0; i < cacheStatistics.numSets ; ++i)
 	{
-		//TODO Do you think LRU should retain state on clear, or not?
-		//cachePtr[i].plruBits = 0;
 		for(j = 0; j < cacheStatistics.associativity; ++i)
 		{
-			cachePtr[i].setPtr[j].mesifBits = 0;
+			cachePtr[i].setPtr[j].mesifBits = eINVALID;
 		}
 	}
 }
@@ -205,7 +203,7 @@ void ExecuteCommand8()
    ================================================================================== */
 void ExecuteCommand9()
 {
-	//OutputValidLines();
+	OutputValidLines();
 }
 
 

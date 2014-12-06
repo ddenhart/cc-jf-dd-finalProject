@@ -26,12 +26,6 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
-
-
-//dd TODO: should we use silent or debug? i am used to debug but faust uses silent...
-//cc DEBUG and SILENT are different and we need both
-//cc DEBUG is just for us to print whatever for debug
-//cc SILENT is for suppressing all output except for statistics
 #define DEBUG				1
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
@@ -48,7 +42,6 @@ Description: 	This file contains:
 #define PRINT_VALID_LINES	9		// Command 9 = print valid lines' contents and state
 
 // Pseudo LRU #defines
-#define EVICT_LINE			0
 #define CACHE_HIT			1
 #define CACHE_MISS			0
 
@@ -113,6 +106,7 @@ int * binarySearchArray;
 //void setCacheParams(long int *arg);
 unsigned int takeLogBase2 (unsigned int vars);
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
+unsigned int GetLineAddress(unsigned int address);
 int ConvertToBase(int num);
 void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line);
 unsigned int GetLineTag(unsigned int set, unsigned int line);

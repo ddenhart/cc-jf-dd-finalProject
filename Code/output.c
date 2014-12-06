@@ -110,7 +110,6 @@ void OutputStatistics()
 	Returns:				void
 	Description:			Output the contents and state of all valid lines in the cache
    ================================================================================== */
-/*
 void OutputValidLines()
 {
 	unsigned int i, j, mesifState;
@@ -141,4 +140,4 @@ void OutputValidLines()
 			}
 	}
 } 
-*/
+
