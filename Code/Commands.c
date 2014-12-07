@@ -119,7 +119,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 			flag = CACHE_HIT;
 			++cacheStatistics.numHits;
 			++cacheStatistics.numAccesses;
-			++cacheStatistics.numReads;
+			++cacheStatistics.numWrites;
 			cacheLine = setCount;
          	UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
@@ -137,7 +137,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	{
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;			//Increment statistics
-		++cacheStatistics.numReads;
+		++cacheStatistics.numWrites;
 		checkVictim = writeBuffer(baseAddress, CHECK, 0);	//Check the write buffer for the base hexaddress
 		if (checkVictim > -1)
 			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
@@ -179,9 +179,6 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-			++cacheStatistics.numHits;
-			++cacheStatistics.numAccesses;		//Increment statistics
-			++cacheStatistics.numReads;
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
 			{
 				message = TRUE;
@@ -192,9 +189,6 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 	}
 	if (!foundFlag)
 	{
-		++cacheStatistics.numMisses;
-		++cacheStatistics.numAccesses;			//Increment statistics
-		++cacheStatistics.numReads;
 		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
 		if (checkVictim > -1)
 		{
@@ -271,9 +265,6 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-			++cacheStatistics.numHits;
-			++cacheStatistics.numAccesses;		//Increment statistics
-			++cacheStatistics.numReads;
 			message = TRUE;
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
@@ -281,9 +272,6 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 	}
 	if (!foundFlag)
 	{
-		++cacheStatistics.numMisses;
-		++cacheStatistics.numAccesses;			//Increment statistics
-		++cacheStatistics.numReads;
 		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
 		if (checkVictim > -1)
 		{
@@ -314,10 +302,10 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 int ExecuteCommand8()
 {
 	unsigned int i, j;
-   //dd TODO this causes an exception
+
 	for(i = 0; i < cacheStatistics.numSets ; ++i)
 	{
-		for(j = 0; j < cacheStatistics.associativity; ++i)
+		for(j = 0; j < cacheStatistics.associativity; ++j)
 		{
 			cachePtr[i].setPtr[j].mesifBits = eINVALID;
 		}
