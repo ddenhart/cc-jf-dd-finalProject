@@ -26,6 +26,7 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
+#define DEBUG_LRU		1
 #define DEBUG				1
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits

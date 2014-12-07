@@ -56,7 +56,9 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 		{
 			return -1;
 		}
-
+#ifdef DEBUG_LRU
+		printf("H\n");
+#endif
 		*eviction = FALSE;
 		evictedLine = 0;
 	}
@@ -77,6 +79,9 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 				{
 						return -1;
 				}
+#ifdef DEBUG_LRU
+				printf("M: Available invalid line %d\n", i);
+#endif
 				*eviction = FALSE;	// No, we did not evict a line, since we had an invalid line available
 				return evictedLine;
 			}
@@ -104,7 +109,9 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 				return -1;
 			}
 		}
-
+#ifdef DEBUG_LRU
+		printf("M: Evict line %d\n", evictedLine);
+#endif
 		*eviction = TRUE;		// Yes, we need to evict a line
 	}
 	// If flag is bogus, report error and terminate program
@@ -144,10 +151,6 @@ int SetPseudoLRU(unsigned int set, unsigned int line, int min, int max)
 	}	
 	else
 	{
-#ifdef DEBUG
-		printf("\nGetting the midpoint between min = %d and max = %d\n", min, max);
-#endif
-
 		// Get bit number to write in the imaginary LRU bits tree
 		int bitToSet = GetMidpoint(min, max);
 		
@@ -155,18 +158,12 @@ int SetPseudoLRU(unsigned int set, unsigned int line, int min, int max)
 		if(line <= binarySearchArray[bitToSet])
 		{
 			cachePtr[set].plruBits |= (1 << bitToSet);
-#ifdef DEBUG
-			printf("Pseudo LRU bits = 0x%x\n\n", cachePtr[set].plruBits);
-#endif
 			return SetPseudoLRU(set, line, min, bitToSet);
 		}
 		// If MRU line index is greater than current bit to write, clear bit (0)
 		else
 		{
 			cachePtr[set].plruBits &= ~(1 << bitToSet);
-#ifdef DEBUG			
-			printf("Pseudo LRU bits = 0x%x\n\n", cachePtr[set].plruBits);
-#endif
 			return SetPseudoLRU(set, line, bitToSet+1, max);
 		}
 	}
@@ -203,15 +200,9 @@ int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bit
 	{
 		// Get bit number to read from imaginary LRU bits tree
 		* bitToRead = GetMidpoint(min, max);
-#ifdef DEBUG
-		printf("We are reading bit %d\n", *bitToRead);
-#endif
 
 		// Get value of current bit being read from the imaginary LRU bit tree
 		* bitValue = ((cachePtr[set].plruBits) & (1 << (*bitToRead))) >> (*bitToRead);
-#ifdef DEBUG
-		printf("The value of bit %d is %d\n", *bitToRead, *bitValue);
-#endif		
 
 		// If current bit is 0, take left branch of imaginary LRU bits tree
 		if(*bitValue == 0)
@@ -236,10 +227,6 @@ int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bit
      ================================================================================== */
 int GetMidpoint(int min, int max) // Find line to be evicted
 {
-#ifdef DEBUG
-	printf("New midpoint is %d\n", min + ((max - min) / 2));
-#endif
-
 	return (min + ((max - min) / 2));
 }
 
