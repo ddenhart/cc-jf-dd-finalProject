@@ -229,6 +229,7 @@ void SetLineTag(unsigned int set, unsigned int line, unsigned int * tag)
 int CreateCache()
 {
 	unsigned int i;
+	long long int bufferSize = 8;
 
     // Allocate memory for both sets and cache (initialize all bytes to 0 with calloc)
     if((cachePtr = (struct set_t*)calloc(cacheStatistics.numSets, sizeof(struct set_t))) == NULL)
@@ -246,12 +247,7 @@ int CreateCache()
 		}
 	}
 
-	/*if ((victimPtr.vCacheArray = (struct vCache_C*)calloc(VICTIM_CACHE_SIZE, sizeof(struct vCache_C))) == NULL)
-	{
-		fprintf(stderr, "In function %s, line %d: calloc failed to allocate memory for Victim Cache\n", __FUNCTION__, __LINE__);
-		return -1;
-	}*/
-
+	writePtr.wBufferArray = malloc(sizeof(long long int)* bufferSize);
 	for (i = 0; i < WRITE_BUFFER_SIZE; ++i)
 	{
 		writePtr.wBufferArray[i] = -1;

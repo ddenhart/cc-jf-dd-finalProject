@@ -59,7 +59,16 @@ int ParseFile(char * Filename)
 		if (feof(traceFile))
 		{
 			lineHolder[counter] = '\0';
-			ProgramWrapper(lineHolder, operation);
+			if ((isSpace == 0) && (counter > 0))
+			{
+				break;
+			}
+			else
+			{
+				int returnValue = ProgramWrapper(lineHolder, operation);
+				if (returnValue < 0)
+					return -1;
+			}
 			break;
 		}
 		if (characterInLine == '\n')
@@ -117,16 +126,16 @@ int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation,
 		return ExecuteCommand1(index, tag, HexAddress);
 		break;
 	case SNOOPED_INVALIDATE:
-		return ExecuteCommand3(HexAddress);
+		return ExecuteCommand3(index, tag, HexAddress);
 		break;
 	case SNOOPED_READ:
-		return ExecuteCommand4(HexAddress);
+		return ExecuteCommand4(index, tag, HexAddress);
 		break;
 	case SNOOPED_WRITE:
-		return ExecuteCommand5(HexAddress);
+		return ExecuteCommand5(index, tag, HexAddress);
 		break;
 	case SNOOPED_RWIM:
-		return ExecuteCommand6(HexAddress);
+		return ExecuteCommand6(index, tag, HexAddress);
 		break;
 	case CLEAR_CACHE:
 		return ExecuteCommand8();

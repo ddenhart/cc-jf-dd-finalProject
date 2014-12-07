@@ -25,40 +25,42 @@
 
 /* ==================================================================================
 	Function name:	ExecuteCommands02
- 	Arguments:
-	Returns:
-	Description: read request from L2 data cache, read request from L2 instruction cache
+ 	Arguments:		unsigned int index
+					unsigned int tag
+					unsigned int HexAddress
+	Returns:		0 if the function and underlying functions did not have a failure
+					-1 if there was a failure
+	Description:	read request from L2 data cache, read request from L2 instruction cache
+					update the LRU and mesif states as well as the write buffer for 
+					evictions and incoming cache lines.
    ================================================================================== */
-
-//TODO JF: Should we run the parser again on the returned address from the write buffer?  I don't see why you would, especially since it is already done, and at that point you are just looking for
-// the data.
-//TODO JF: Get the Update Mesif state function from Deb
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
 	int cacheLine = 0;
 	int max = cacheStatistics.associativity - 1;
 	int min = 0;
+	int checkVictim = 0;
 	int cmd = DATA_READ_REQ;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int setCount = 0;
-	int checkVictim = 0;
-	int baseAddress = 0;
+	unsigned int baseEvict = 0;
+	unsigned int baseAddress = 0;
 	unsigned int eviction = 0;
 
-	baseAddress = GetLineAddress(HexAddress);
+	//unsigned int baseIndex = index << (ConvertToBase(cacheStatistics.lineSize));
+	//unsigned int baseTag = tag << (ConvertToBase(baseIndex));
+	baseAddress = GetLineAddress(HexAddress);	//Convert the hex address to its base hex address by removing the offset
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
-			flag = CACHE_HIT;
+			flag = CACHE_HIT;				//Trip the hit flag
 			++cacheStatistics.numHits;
-			++cacheStatistics.numAccesses;
+			++cacheStatistics.numAccesses;  //Update the hit statistics
 			++cacheStatistics.numReads;
-         	cacheLine = setCount;
-         	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
-			// MessageToL2();
-			//printf("Reading %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
+         	cacheLine = setCount;			//Get the cache line for the LRU update
+         	UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			break;
 		}
 	}
@@ -68,22 +70,23 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	else if (flag == CACHE_MISS)
 	{
 		++cacheStatistics.numMisses;
-		++cacheStatistics.numAccesses;
+		++cacheStatistics.numAccesses;  //Update the miss statistics
 		++cacheStatistics.numReads;
-		checkVictim = writeBuffer(HexAddress, CHECK, 0);
+		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
 		if (checkVictim > -1)
-			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
+			baseAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress
 		else if (checkVictim == -3)
 			return -1;
 		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)  && (eviction == TRUE))
 		{
-			writeBuffer(cacheLine, INSERT, 0);
+			baseEvict = ((cachePtr[index].setPtr[cacheLine].tagBits << (ConvertToBase(index << (ConvertToBase(cacheStatistics.lineSize))))) + (index << (ConvertToBase(cacheStatistics.lineSize))));
+			writeBuffer(baseEvict, INSERT, 0);
 		}
      	cachePtr[index].setPtr[cacheLine].tagBits = tag;
-      	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
-	  	ReadMemory(HexAddress);
+      	UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  	ReadMemory(baseAddress);
 	}
-	// MessageToL2() Invalidate the line;
+	MessageToL2Cache(cmd, baseAddress, &eviction, baseEvict);
 	return 0;
 }
 
@@ -99,13 +102,16 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	int cacheLine = 0;
 	int max = cacheStatistics.associativity - 1;
 	int min = 0;
+	int checkVictim = 0;
     int cmd = DATA_WRITE_REQ;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int setCount = 0;
-	int checkVictim = 0;
+	unsigned int baseEvict = 0;
+	unsigned int baseAddress = 0;
 	unsigned int eviction = 0;
 
+	baseAddress = GetLineAddress(HexAddress);
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
@@ -115,34 +121,38 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
 			cacheLine = setCount;
-         	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
+         	UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
 	}
 	cacheLine = UpdateLRU(index, cacheLine, min, max, flag, &eviction);
+	//unsigned int baseIndex = index << (ConvertToBase(cacheStatistics.lineSize));
+	//unsigned int baseTag = tag << (ConvertToBase(baseIndex));
+
+	//printf("INDEX + TAG: %u\n", ((tag << (ConvertToBase(index << (ConvertToBase(cacheStatistics.lineSize)))))+(index << (ConvertToBase(cacheStatistics.lineSize)))));
 	if (cacheLine < 0)
 		return -1;
 	else if (flag == CACHE_MISS)
 	{
 		++cacheStatistics.numMisses;
-		++cacheStatistics.numAccesses;
+		++cacheStatistics.numAccesses;			//Increment statistics
 		++cacheStatistics.numReads;
-		checkVictim = writeBuffer(HexAddress, CHECK, 0);
+		checkVictim = writeBuffer(baseAddress, CHECK, 0);	//Check the write buffer for the base hexaddress
 		if (checkVictim > -1)
-			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
+			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
 		else if (checkVictim == -3)
-			return -1;							//Return that there was an error in the buffer.
+			return -1;							//Return that there was an error in the buffer
 		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED) && (eviction == TRUE))
 		{
-			writeBuffer(cacheLine, INSERT, 0);
-			//TODO JF: Put evicted line into Victim Cache;
+			baseEvict = ((cachePtr[index].setPtr[cacheLine].tagBits << (ConvertToBase(index << (ConvertToBase(cacheStatistics.lineSize))))) + (index << (ConvertToBase(cacheStatistics.lineSize))));  //Terrible line to get the base address.
+			writeBuffer(baseEvict, INSERT, 0); //Write the base address of the evicted line to buffer.  Offset bits do not matter, and we read a whole line anyways.
 		}
       	cachePtr[index].setPtr[cacheLine].tagBits = tag;
-      	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
-	  	WriteMemory(HexAddress);
+		UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  	WriteMemory(baseAddress);
 	}
-	// MessageToL2();
+	MessageToL2Cache(cmd, baseAddress, &eviction, baseEvict); //Message to L2 cache for inclusivity
 	return 0;
 }
 
@@ -153,13 +163,56 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	Returns:
 	Description: snooped invalidate command
    ================================================================================== */
-int ExecuteCommand3(unsigned int HexAddress)
+int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
     unsigned int SnoopResult = 0;
+	unsigned int baseAddress = 0;
+	int setCount = 0;
+	int checkVictim = 0;
+	int foundFlag = FALSE;
+	int message = FALSE;
+	unsigned int eviction = 0;
 
-    BusOperation(INVALIDATE, HexAddress, &SnoopResult);
-    PutSnoopResult(HexAddress, SnoopResult);
-	
+	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
+	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
+	{
+		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
+		{
+			foundFlag = TRUE;
+			++cacheStatistics.numHits;
+			++cacheStatistics.numAccesses;		//Increment statistics
+			++cacheStatistics.numReads;
+			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
+			{
+				message = TRUE;
+			}
+			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
+			break;
+		}
+	}
+	if (!foundFlag)
+	{
+		++cacheStatistics.numMisses;
+		++cacheStatistics.numAccesses;			//Increment statistics
+		++cacheStatistics.numReads;
+		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
+		if (checkVictim > -1)
+		{
+			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
+			foundFlag = TRUE;
+		}
+		else if (checkVictim == -3)
+			return -1;							//Return that there was an error in the buffer
+	}
+
+	//TODO DEB: Do you need to know that it failed finding it so that we can sent the snoop result?
+    BusOperation(INVALIDATE, baseAddress, &SnoopResult);
+    PutSnoopResult(baseAddress, SnoopResult);
+
+	if (message)
+	{
+		MessageToL2Cache(SNOOPED_INVALIDATE, baseAddress, &eviction, baseAddress); //Message to L2 cache for inclusivity
+	}
 	return 0;
 }
 
@@ -170,7 +223,7 @@ int ExecuteCommand3(unsigned int HexAddress)
 	Returns:
 	Description: snooped read request
    ================================================================================== */
-int ExecuteCommand4(unsigned int HexAddress)
+int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
     unsigned int SnoopResult = 0;
 
@@ -187,7 +240,7 @@ int ExecuteCommand4(unsigned int HexAddress)
 	Returns:
 	Description: snooped write request
    ================================================================================== */
-int ExecuteCommand5(unsigned int HexAddress)
+int ExecuteCommand5(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
     unsigned int SnoopResult = 0;
 
@@ -204,13 +257,52 @@ int ExecuteCommand5(unsigned int HexAddress)
 	Returns:
 	Description: snooped read with intent to modify
    ================================================================================== */
-int ExecuteCommand6(unsigned int HexAddress)
+int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
     unsigned int SnoopResult = 0;
+	unsigned int baseAddress = 0;
+	int setCount = 0;
+	int checkVictim = 0;
+	int foundFlag = FALSE;
+	int message = FALSE;
+	unsigned int eviction = 0;
 
-    BusOperation(RWIM, HexAddress, &SnoopResult);
-    PutSnoopResult(HexAddress, SnoopResult);
+	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
+	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
+	{
+		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
+		{
+			foundFlag = TRUE;
+			++cacheStatistics.numHits;
+			++cacheStatistics.numAccesses;		//Increment statistics
+			++cacheStatistics.numReads;
+			message = TRUE;
+			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
+			break;
+		}
+	}
+	if (!foundFlag)
+	{
+		++cacheStatistics.numMisses;
+		++cacheStatistics.numAccesses;			//Increment statistics
+		++cacheStatistics.numReads;
+		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
+		if (checkVictim > -1)
+		{
+			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
+			eviction = TRUE;
+			foundFlag = TRUE;
+		}
+		else if (checkVictim == -3)
+			return -1;							//Return that there was an error in the buffer
+	}
+    BusOperation(RWIM, baseAddress, &SnoopResult);
+    PutSnoopResult(baseAddress, SnoopResult);
 	
+	if (message)
+	{
+		MessageToL2Cache(SNOOPED_RWIM, baseAddress, &eviction, baseAddress); //Message to L2 cache for inclusivity
+	}
 	return 0;
 }
 

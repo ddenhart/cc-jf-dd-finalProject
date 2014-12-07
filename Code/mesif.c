@@ -408,7 +408,8 @@ enum Mesif_states GetHitMiss(int found, enum Mesif_states eCurrent)
         }
     }
     else
-    {        eError = eCBUS_ERROR;
+    {
+        eError = eCBUS_ERROR;
     }
 
     return eError;
@@ -433,7 +434,10 @@ enum mesif_err SetMesifState(enum Mesif_states eState)
     }
     else
     {
-        eError = eSYNTAX_NULL_ERROR;    }        return eError;
+        eError = eSYNTAX_NULL_ERROR;
+    }
+    
+    return eError;
 }
 
 
@@ -467,18 +471,24 @@ enum mesif_err StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesif
                     *eNext = eFORWARD;
                 }
                 else
-                {                    eError = eCBUS_ERROR;
+                {
+                    eError = eCBUS_ERROR;
                 }
-            }            else if(sMesifBits.eFlag ==eSBUS)
+            }
+            else if(sMesifBits.eFlag ==eSBUS)
             {
                 *eNext = eINVALID;
             }
             else
             {
-                eError = eFLAG_ERROR;            }            break;
+                eError = eFLAG_ERROR;
+            }
+            break;
         case eMODIFIED:
             if(sMesifBits.eFlag == eCBUS)
-            {                *eNext = eMODIFIED;            }
+            {
+                *eNext = eMODIFIED;
+            }
             else if(sMesifBits.eFlag ==eSBUS)
             {
                 if(eSROW_M_I == iStateRow)

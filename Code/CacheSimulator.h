@@ -82,7 +82,7 @@ enum Mesif_states {
 
 // Cache victim struct
 struct vCache_C {
-	long long int wBufferArray[WRITE_BUFFER_SIZE];	//Write Array Buffer
+	long long int * wBufferArray;	//Write Array Buffer
 } vCache;
 
 // Cache statistics struct
@@ -136,10 +136,10 @@ int ValidateInputs();
 // Commands Functions
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
 int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
-int ExecuteCommand3(unsigned int HexAddress);
-int ExecuteCommand4(unsigned int HexAddress);
-int ExecuteCommand5(unsigned int HexAddress);
-int ExecuteCommand6(unsigned int HexAddress);
+int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddress);
+int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddress);
+int ExecuteCommand5(unsigned int index, unsigned int tag, unsigned int HexAddress);
+int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddress);
 int ExecuteCommand8();
 int ExecuteCommand9();
 

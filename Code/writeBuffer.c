@@ -30,7 +30,7 @@ int writeBuffer(long long int fullAddress, int action, int trigger)
 	int hit = FALSE;
 	if (trigger > 2)
 	{
-		writePtr.wBufferArray[0] = -1;
+		//writePtr.wBufferArray[0] = -1;
 		for (innerCounter = 0; innerCounter < WRITE_BUFFER_SIZE; ++innerCounter)
 		{
 			if (innerCounter + 1 == WRITE_BUFFER_SIZE)
@@ -39,7 +39,6 @@ int writeBuffer(long long int fullAddress, int action, int trigger)
 				writePtr.wBufferArray[innerCounter] = writePtr.wBufferArray[innerCounter + 1];
 		}
 		return 0;
-		//Message saying it is written to memory??
 	}
 	if (action == INSERT)
 	{
@@ -48,15 +47,10 @@ int writeBuffer(long long int fullAddress, int action, int trigger)
 			if (writePtr.wBufferArray[counter] == -1)
 			{
 				writePtr.wBufferArray[counter] = fullAddress;
-				hit = TRUE;
-			}
-			if ((counter == WRITE_BUFFER_SIZE - 1) && (hit == FALSE))
-			{
-				//MessageToL2Cache()  Need to update this for the victim write
-				//Or do we just write it to memory and not do a eviction/replacement in the buffer?
-				writePtr.wBufferArray[counter] = fullAddress;
-			}
+				return 0;
+			}			
 		}
+		writePtr.wBufferArray[0] = fullAddress;
 		return 0;
 	}
 	else if (action == CHECK)
@@ -72,11 +66,10 @@ int writeBuffer(long long int fullAddress, int action, int trigger)
 					else
 						writePtr.wBufferArray[innerCounter] = writePtr.wBufferArray[innerCounter + 1];
 				}
-				//Message showing a return from the write Buffer??
 				return fullAddress;
 			}
 		}
-		return -1;
+		return -1;  //No address matching the checked for address is in the buffer.
 	}
 	return -3;  //Error, the wrong parameters were entered.
 }
