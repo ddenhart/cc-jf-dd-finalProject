@@ -124,9 +124,6 @@ int * binarySearchArray;
 /*  FUNCTION PROTOTYPES  */
 // Utility Prototypes
 // ------------------
-//char* handleInputs(char **argv, int argc, char *filename);
-//void setCacheParams(long int *arg);
-unsigned int takeLogBase2 (unsigned int vars);
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 unsigned int GetLineAddress(unsigned int address);
 int ConvertToBase(int num);

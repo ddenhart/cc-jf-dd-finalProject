@@ -16,7 +16,5 @@ Description: 	This file contains:
 	
 ================================================================================== */
 
-void printSettings();
-void printStatistics();
 void OutputStatistics();
 void OutputValidLines();

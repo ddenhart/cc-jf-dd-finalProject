@@ -376,21 +376,3 @@ void WriteMemory(unsigned int address)
 	printf("Memory write to Address: %#x", address);
 #endif
 }
-
-/* ===============================================================================
-takeLogBase2: Returns log base 2 of the input
-
-@input: unsigned int vars
-
-@output: unsigned int
-
-================================================================================== */
-unsigned int takeLogBase2 (unsigned int vars)
-{
-	double base = 2.;
-	double dvars = (double)vars;
-	double quot = log(dvars);
-	double div = log(base);
-	double result = (quot/div);
-	return (int)result;
-}
