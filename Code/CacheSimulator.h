@@ -12,7 +12,7 @@ Author:			Carmen Ciobanu
 				Jeremiah Franke
 Modified:		Deborah Denhart		12/02/2014
 				Jeremiah Franke		12/04/2014
-			Carmen Ciobanu		12/04/2014
+				Carmen Ciobanu		12/04/2014
                 
 Description: 	This file contains:
 				- #defines
@@ -47,7 +47,13 @@ Description: 	This file contains:
 
 // consts
 #define INPUT_BUFFER_SIZE 100
+#define VICTIM_CACHE_SIZE	8
+
 //#define ALWAYS				1  //For the two utility prototypes.
+
+// victimCache actions
+#define INSERT				0
+#define CHECK				1
 
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used
@@ -63,6 +69,11 @@ enum Mesif_states {
 
 
 /*  DATA STRUCTURES  */
+
+// Cache victim struct
+struct vCache_C {
+	long int * vCacheArray;				//Victim Array Buffer
+} vCache;
 
 // Cache statistics struct
 struct statistics_t {
@@ -94,6 +105,7 @@ struct set_t {
 
 // Cache (dynamic array of set structs)
 struct set_t * cachePtr;			// Cache = array of sets
+struct vCache_C victimPtr;			// Victim Pointer
 
 // Dynamic array for pseudo LRU binary search
 int * binarySearchArray;			
@@ -108,6 +120,7 @@ unsigned int takeLogBase2 (unsigned int vars);
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 unsigned int GetLineAddress(unsigned int address);
 int ConvertToBase(int num);
+unsigned int BaseAddress(unsigned int address);
 void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line);
 unsigned int GetLineTag(unsigned int set, unsigned int line);
 void SetLineTag();
@@ -119,12 +132,12 @@ int ValidateInputs();
 // Commands Functions
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
 int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
-void ExecuteCommand3(unsigned int index, unsigned int tag);
-void ExecuteCommand4(unsigned int index, unsigned int tag);
-void ExecuteCommand5(unsigned int index, unsigned int tag);
-void ExecuteCommand6(unsigned int index, unsigned int tag);
-void ExecuteCommand8();
-void ExecuteCommand9();
+int ExecuteCommand3(unsigned int index, unsigned int tag);
+int ExecuteCommand4(unsigned int index, unsigned int tag);
+int ExecuteCommand5(unsigned int index, unsigned int tag);
+int ExecuteCommand6(unsigned int index, unsigned int tag);
+int ExecuteCommand8();
+int ExecuteCommand9();
 
 // Pseudo LRU Functions
 int GetMidpoint(int min, int max);

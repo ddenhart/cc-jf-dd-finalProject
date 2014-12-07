@@ -8,18 +8,14 @@ Jeremiah Franke
 
 ==================================================================================
 
-File: 			parse.h
+File: 			victimCache.h
 Date:			11/16/2014
 Author:			Jeremiah Franke
 Modified:		Jeremiah Franke 12/04/2014
 Description: 	This file contains:
--
+-The prototypes for the victim cache.
 
 ================================================================================== */
 
-#define SIZE 100  //Size of the HEX array
 
-void ParseHexAddress(char * HexAddress, unsigned int * tag, unsigned int * index, unsigned int * convertedHex);
-int ProgramWrapper(char * HexAddress, unsigned int operation);
-int ParseFile(char * Filename);
-int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation, unsigned int HexAddress);
+int victimCache(unsigned int fullAddress, int action, int trigger);

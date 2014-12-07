@@ -63,7 +63,7 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 	// If the request was made due to a cache miss, find an invalid line to bring in new line or find line to evict and write LRU bits
 	else if(flag == CACHE_MISS)
 	{	
-		int i;
+		unsigned int i;
 		unsigned int mesifState;
 
 		// First of all, search for remaining invalid lines in the set

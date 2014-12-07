@@ -22,6 +22,7 @@
 #include "CacheSimulator.h" 
 #include "mesif.h"
 #include "output.h"
+#include "victimCache.h"
 
 /* ==================================================================================
 	Function name:	ExecuteCommands02
@@ -30,9 +31,9 @@
 	Description:
    ================================================================================== */
 
+//TODO JF: Should we run the parser again on the returned address from the victim cache?  I don't see why you would, especially since it is already done, and at that point you are just looking for
+// the data.
 //TODO JF: Get the Update Mesif state function from Deb
-//TODO JF: Write the victim cache
-
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
 	int cacheLine = 0;
@@ -40,9 +41,15 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	int min = 0;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
+	unsigned int setCount = 0;
+	int checkVictim = 0;
+	int baseAddress = 0;
 	unsigned int eviction = 0;
 
-	for (int setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
+	printf("Hex Address %x, %d\n", HexAddress, HexAddress);
+	baseAddress = BaseAddress(HexAddress);
+	printf("Base Address %x, %d\n", baseAddress, baseAddress);
+	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
@@ -51,8 +58,7 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
 			cacheLine = setCount;
-			//updateMesifState(index, tag);  Update the MESIF State
-			// MessageToL2();
+			//TODO JF & DB: updateMesifState(index, setCount);  Update the MESIF State
 			//printf("Reading %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
@@ -65,13 +71,20 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;
 		++cacheStatistics.numReads;
-		if (cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)
+		checkVictim = victimCache(HexAddress, CHECK, 0);
+		printf("CHECK VICTIM: %d\n", checkVictim);
+		if (checkVictim > -1)
+			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
+		else if (checkVictim == -3)
+			return -1;
+		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)  && (eviction == TRUE))
 		{
-			//TODO JF: Put evicted line into Victim Cache;
+			victimCache(cacheLine, INSERT, 0);
 		}
+		//TODO JF & DB: Update MESIF
 		cachePtr[index].setPtr[cacheLine].tagBits = tag;
-		ReadMemory(HexAddress);
 	}
+	// MessageToL2() Invalidate the line;
 	printf("\nTest\n");
 	return 0;
 }
@@ -90,9 +103,11 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	int min = 0;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
+	unsigned int setCount = 0;
+	int checkVictim = 0;
 	unsigned int eviction = 0;
 
-	for (int setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
+	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
@@ -102,7 +117,6 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 			++cacheStatistics.numReads;
 			cacheLine = setCount;
 			//updateMesifState(index, tag);  Update the MESIF state.
-			// MessageToL2();
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
@@ -115,13 +129,22 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;
 		++cacheStatistics.numReads;
-		if (cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)
+		checkVictim = victimCache(HexAddress, CHECK, 0);
+		if (checkVictim > -1)
+			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
+		else if (checkVictim == -3)
+			return -1;							//Return that there was an error in the buffer.
+		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED) && (eviction == TRUE))
 		{
+			victimCache(cacheLine, INSERT, 0);
+			for (int count = 0; count < VICTIM_CACHE_SIZE; ++count)
+				printf("\nVictim Cache %u \n", victimPtr.vCacheArray[count]);
 			//TODO JF: Put evicted line into Victim Cache;
 		}
+		//updateMesifState(index, tag);  Update the MESIF state.
 		cachePtr[index].setPtr[cacheLine].tagBits = tag;
-		WriteMemory(HexAddress);
 	}
+	// MessageToL2();
 	return 0;
 	printf("\nCommand 1\n");
 }
@@ -133,7 +156,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	Returns:
 	Description:
    ================================================================================== */
-void ExecuteCommand3(unsigned int index, unsigned int tag)
+int ExecuteCommand3(unsigned int index, unsigned int tag)
 {
 	// TODO
 }
@@ -145,7 +168,7 @@ void ExecuteCommand3(unsigned int index, unsigned int tag)
 	Returns:
 	Description:
    ================================================================================== */
-void ExecuteCommand4(unsigned int index, unsigned int tag)
+int ExecuteCommand4(unsigned int index, unsigned int tag)
 {
 	// TODO
 }
@@ -157,7 +180,7 @@ void ExecuteCommand4(unsigned int index, unsigned int tag)
 	Returns:
 	Description:
    ================================================================================== */
-void ExecuteCommand5(unsigned int index, unsigned int tag)
+int ExecuteCommand5(unsigned int index, unsigned int tag)
 {
 	// TODO
 }
@@ -169,7 +192,7 @@ void ExecuteCommand5(unsigned int index, unsigned int tag)
 	Returns:
 	Description:
    ================================================================================== */
-void ExecuteCommand6(unsigned int index, unsigned int tag)
+int ExecuteCommand6(unsigned int index, unsigned int tag)
 {
 	// TODO
 }
@@ -181,7 +204,7 @@ void ExecuteCommand6(unsigned int index, unsigned int tag)
 	Returns:
 	Description:			Clear cache / Invalidate all lines
    ================================================================================== */
-void ExecuteCommand8()
+int ExecuteCommand8()
 {
 	unsigned int i, j;
 
@@ -201,7 +224,7 @@ void ExecuteCommand8()
 	Returns:
 	Description:			Print valid lines
    ================================================================================== */
-void ExecuteCommand9()
+int ExecuteCommand9()
 {
 	OutputValidLines();
 }

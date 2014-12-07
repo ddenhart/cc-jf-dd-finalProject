@@ -34,16 +34,14 @@
    ================================================================================== */
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag)
 {
-	ConvertToBase(cacheStatistics.lineSize+33);
 	unsigned int numOffsetBits = ConvertToBase(cacheStatistics.lineSize);
 	unsigned int numIndexBits = ConvertToBase(cacheStatistics.numSets);
 	unsigned int addressSize = ADDR_SIZE;
 	unsigned int numTagBits = addressSize - (numOffsetBits + numIndexBits);
-	printf("\n%d, %d, %d, %d",addressSize, numOffsetBits, numIndexBits, numTagBits);
+	//printf("\n%d, %d, %d, %d",addressSize, numOffsetBits, numIndexBits, numTagBits);
 	*index = ((*address) << numTagBits) >> (numOffsetBits + numTagBits);
 	*tag = (*address) >> (numOffsetBits + numIndexBits);
 }
-
 
 /* ==================================================================================
 	Function name: GetLineAddress
@@ -204,7 +202,7 @@ int ConvertToBase(int num)
 	Returns:
 	Description:
    ================================================================================== */
-int GetLineTag(unsigned int set, unsigned int line)
+unsigned int GetLineTag(unsigned int set, unsigned int line)
 {
 	return cachePtr[set].setPtr[line].tagBits;
 }
@@ -230,7 +228,7 @@ void SetLineTag(unsigned int set, unsigned int line, unsigned int * tag)
    ================================================================================== */
 int CreateCache()
 {
-	int i;
+	unsigned int i;
 
     // Allocate memory for both sets and cache (initialize all bytes to 0 with calloc)
     if((cachePtr = (struct set_t*)calloc(cacheStatistics.numSets, sizeof(struct set_t))) == NULL)
@@ -248,6 +246,17 @@ int CreateCache()
 		}
 	}
 
+	if ((victimPtr.vCacheArray = (struct vCache_C*)calloc(VICTIM_CACHE_SIZE, sizeof(struct vCache_C))) == NULL)
+	{
+		fprintf(stderr, "In function %s, line %d: calloc failed to allocate memory for Victim Cache\n", __FUNCTION__, __LINE__);
+		return -1;
+	}
+
+	for (i = 0; i < VICTIM_CACHE_SIZE; ++i)
+	{
+		victimPtr.vCacheArray[i] = -1;
+	}
+	
 	// Create binary search array for pseudo LRU algorithm
 	if ((binarySearchArray = (int*) malloc(sizeof(int) * cacheStatistics.associativity)) == NULL)
 	{
@@ -276,7 +285,7 @@ int CreateCache()
    ================================================================================== */
 void DestroyCache()
 {
-	int i;
+	unsigned int i;
 
 	// Deallocate memory for cache structure (all levels)
     for (i = 0; i < cacheStatistics.numSets; ++i)
