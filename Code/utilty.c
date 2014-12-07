@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "CacheSimulator.h"
-#include "mesif.h"
+//#include "mesif.h"
 #include "output.h"
 
 

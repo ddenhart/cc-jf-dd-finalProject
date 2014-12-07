@@ -67,6 +67,7 @@ int main(int argc, char * argv[])
 
     // Initialize  cache parameters
     InitParams();
+    InitMesif();
 
     // Allocate memory for the cache
     returnValue =  CreateCache();

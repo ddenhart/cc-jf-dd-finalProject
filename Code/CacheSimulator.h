@@ -29,6 +29,8 @@ Description: 	This file contains:
 #define DEBUG				1
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
+#define INPUT_BUFFER_SIZE 	100
+#define VICTIM_CACHE_SIZE	8
 
 // Trace File Commands
 #define DATA_READ_REQ		0		// Command 0 = read request from L2 data cache
@@ -45,9 +47,16 @@ Description: 	This file contains:
 #define CACHE_HIT			1
 #define CACHE_MISS			0
 
-// consts
-#define INPUT_BUFFER_SIZE 100
-#define VICTIM_CACHE_SIZE	8
+//bus operation types
+#define READ 1
+#define WRITE 2
+#define INVALIDATE 3
+#define RWIM 4
+
+//snoop results
+#define NOHIT 0
+#define HIT 1
+#define HITM 2
 
 //#define ALWAYS				1  //For the two utility prototypes.
 
@@ -120,9 +129,6 @@ unsigned int takeLogBase2 (unsigned int vars);
 void ParseAddress(unsigned int * address, unsigned int * index, unsigned int * tag);
 unsigned int GetLineAddress(unsigned int address);
 int ConvertToBase(int num);
-unsigned int BaseAddress(unsigned int address);
-void UpdateMesif(unsigned int address, unsigned int cmd, unsigned int set, unsigned int line);
-unsigned int GetLineTag(unsigned int set, unsigned int line);
 void SetLineTag();
 int CreateCache();
 void DestroyCache();
@@ -132,10 +138,10 @@ int ValidateInputs();
 // Commands Functions
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress);
 int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress);
-int ExecuteCommand3(unsigned int index, unsigned int tag);
-int ExecuteCommand4(unsigned int index, unsigned int tag);
-int ExecuteCommand5(unsigned int index, unsigned int tag);
-int ExecuteCommand6(unsigned int index, unsigned int tag);
+int ExecuteCommand3(unsigned int HexAddress);
+int ExecuteCommand4(unsigned int HexAddress);
+int ExecuteCommand5(unsigned int HexAddress);
+int ExecuteCommand6(unsigned int HexAddress);
 int ExecuteCommand8();
 int ExecuteCommand9();
 
@@ -144,6 +150,14 @@ int GetMidpoint(int min, int max);
 int SetPseudoLRU(unsigned int set, unsigned int line, int min, int max);
 int GetVictimLine(unsigned int set, int min, int max, int * bitToRead, int * bitValue);
 int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, int * eviction);
+
+// MESIF Functions
+void InitMesif();
+void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsigned int line, int found);
+unsigned int GetMesifState(unsigned int set, unsigned int line);
+// Used to simulate a bus operation and to capture the 
+// snoop results of last level caches of other processors
+void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult);
 
 // Inclusion Function
 void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned int evictedLineAddr);

@@ -16,7 +16,6 @@ Description: 	This file contains:
 	
 ================================================================================== */
 
-void output_event();
 void printSettings();
 void printStatistics();
 void OutputStatistics();

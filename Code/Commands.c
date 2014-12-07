@@ -20,7 +20,6 @@
 #include <stdlib.h>				// general utilities
 #include <string.h>				// string handling
 #include "CacheSimulator.h" 
-#include "mesif.h"
 #include "output.h"
 #include "victimCache.h"
 
@@ -28,7 +27,7 @@
 	Function name:	ExecuteCommands02
  	Arguments:
 	Returns:
-	Description:
+	Description: read request from L2 data cache, read request from L2 instruction cache
    ================================================================================== */
 
 //TODO JF: Should we run the parser again on the returned address from the victim cache?  I don't see why you would, especially since it is already done, and at that point you are just looking for
@@ -39,6 +38,7 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	int cacheLine = 0;
 	int max = cacheStatistics.associativity - 1;
 	int min = 0;
+	int cmd = DATA_READ_REQ;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int setCount = 0;
@@ -47,7 +47,7 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	unsigned int eviction = 0;
 
 	printf("Hex Address %x, %d\n", HexAddress, HexAddress);
-	baseAddress = BaseAddress(HexAddress);
+   baseAddress = GetLineAddress(HexAddress);
 	printf("Base Address %x, %d\n", baseAddress, baseAddress);
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
@@ -57,8 +57,9 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 			++cacheStatistics.numHits;
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
-			cacheLine = setCount;
-			//TODO JF & DB: updateMesifState(index, setCount);  Update the MESIF State
+         cacheLine = setCount;
+         UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
+			// MessageToL2();
 			//printf("Reading %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
@@ -81,8 +82,9 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 		{
 			victimCache(cacheLine, INSERT, 0);
 		}
-		//TODO JF & DB: Update MESIF
-		cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  ReadMemory(HexAddress);
 	}
 	// MessageToL2() Invalidate the line;
 	printf("\nTest\n");
@@ -94,13 +96,14 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	Function name:	ExecuteCommand1
  	Arguments:
 	Returns:
-	Description:
+	Description: write request from L2 data cache
    ================================================================================== */
 int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {	
 	int cacheLine = 0;
 	int max = cacheStatistics.associativity - 1;
 	int min = 0;
+    int cmd = DATA_WRITE_REQ;
 	int flag = CACHE_MISS;
 	int cacheHit = FALSE;
 	unsigned int setCount = 0;
@@ -116,7 +119,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
 			cacheLine = setCount;
-			//updateMesifState(index, tag);  Update the MESIF state.
+         UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
@@ -141,8 +144,9 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 				printf("\nVictim Cache %u \n", victimPtr.vCacheArray[count]);
 			//TODO JF: Put evicted line into Victim Cache;
 		}
-		//updateMesifState(index, tag);  Update the MESIF state.
-		cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  WriteMemory(HexAddress);
 	}
 	// MessageToL2();
 	return 0;
@@ -154,11 +158,16 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	Function name:	ExecuteCommand3
  	Arguments:
 	Returns:
-	Description:
+	Description: snooped invalidate command
    ================================================================================== */
-int ExecuteCommand3(unsigned int index, unsigned int tag)
+int ExecuteCommand3(unsigned int HexAddress)
 {
-	// TODO
+    unsigned int SnoopResult = 0;
+
+    BusOperation(INVALIDATE, HexAddress, &SnoopResult);
+    PutSnoopResult(HexAddress, SnoopResult);
+	
+	return 0;
 }
 
 
@@ -166,11 +175,16 @@ int ExecuteCommand3(unsigned int index, unsigned int tag)
 	Function name:	ExecuteCommand4
  	Arguments:
 	Returns:
-	Description:
+	Description: snooped read request
    ================================================================================== */
-int ExecuteCommand4(unsigned int index, unsigned int tag)
+int ExecuteCommand4(unsigned int HexAddress)
 {
-	// TODO
+    unsigned int SnoopResult = 0;
+
+    BusOperation(READ, HexAddress, &SnoopResult);
+    PutSnoopResult(HexAddress, SnoopResult);
+	
+	return 0;
 }
 
 
@@ -178,11 +192,16 @@ int ExecuteCommand4(unsigned int index, unsigned int tag)
 	Function name:	ExecuteCommand5
  	Arguments:
 	Returns:
-	Description:
+	Description: snooped write request
    ================================================================================== */
-int ExecuteCommand5(unsigned int index, unsigned int tag)
+int ExecuteCommand5(unsigned int HexAddress)
 {
-	// TODO
+    unsigned int SnoopResult = 0;
+
+    BusOperation(WRITE, HexAddress, &SnoopResult);
+    PutSnoopResult(HexAddress, SnoopResult);
+	
+	return 0;
 }
 
 
@@ -190,11 +209,16 @@ int ExecuteCommand5(unsigned int index, unsigned int tag)
 	Function name:	ExecuteCommand6
  	Arguments:
 	Returns:
-	Description:
+	Description: snooped read with intent to modify
    ================================================================================== */
-int ExecuteCommand6(unsigned int index, unsigned int tag)
+int ExecuteCommand6(unsigned int HexAddress)
 {
-	// TODO
+    unsigned int SnoopResult = 0;
+
+    BusOperation(RWIM, HexAddress, &SnoopResult);
+    PutSnoopResult(HexAddress, SnoopResult);
+	
+	return 0;
 }
 
 
@@ -215,6 +239,8 @@ int ExecuteCommand8()
 			cachePtr[i].setPtr[j].mesifBits = eINVALID;
 		}
 	}
+	
+	return 0;
 }
 
 
@@ -227,6 +253,8 @@ int ExecuteCommand8()
 int ExecuteCommand9()
 {
 	OutputValidLines();
+	
+	return 0;
 }
 
 

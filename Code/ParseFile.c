@@ -117,16 +117,16 @@ int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation,
 		return ExecuteCommand1(index, tag, HexAddress);
 		break;
 	case SNOOPED_INVALIDATE:
-		return ExecuteCommand3(index, tag);
+		return ExecuteCommand3(HexAddress);
 		break;
 	case SNOOPED_READ:
-		return ExecuteCommand4(index, tag);
+		return ExecuteCommand4(HexAddress);
 		break;
 	case SNOOPED_WRITE:
-		return ExecuteCommand5(index, tag);
+		return ExecuteCommand5(HexAddress);
 		break;
 	case SNOOPED_RWIM:
-		return ExecuteCommand6(index, tag);
+		return ExecuteCommand6(HexAddress);
 		break;
 	case CLEAR_CACHE:
 		return ExecuteCommand8();
