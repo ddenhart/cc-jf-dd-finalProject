@@ -206,8 +206,8 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 	}
 
 	//TODO DEB: Do you need to know that it failed finding it so that we can sent the snoop result?
-    BusOperation(INVALIDATE, baseAddress, &SnoopResult);
-    PutSnoopResult(baseAddress, SnoopResult);
+   //dd TODO: 0 address??, modify snoop output
+   BusOperation(INVALIDATE, baseAddress, &SnoopResult);
 
 	if (message)
 	{
@@ -228,7 +228,6 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
     unsigned int SnoopResult = 0;
 
     BusOperation(READ, HexAddress, &SnoopResult);
-    PutSnoopResult(HexAddress, SnoopResult);
 	
 	return 0;
 }
@@ -245,7 +244,6 @@ int ExecuteCommand5(unsigned int index, unsigned int tag, unsigned int HexAddres
     unsigned int SnoopResult = 0;
 
     BusOperation(WRITE, HexAddress, &SnoopResult);
-    PutSnoopResult(HexAddress, SnoopResult);
 	
 	return 0;
 }
@@ -296,8 +294,8 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 		else if (checkVictim == -3)
 			return -1;							//Return that there was an error in the buffer
 	}
-    BusOperation(RWIM, baseAddress, &SnoopResult);
-    PutSnoopResult(baseAddress, SnoopResult);
+   //dd TODO: 0 address??, modify snoop output
+   BusOperation(RWIM, baseAddress, &SnoopResult);
 	
 	if (message)
 	{
@@ -316,7 +314,7 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 int ExecuteCommand8()
 {
 	unsigned int i, j;
-
+   //dd TODO this causes an exception
 	for(i = 0; i < cacheStatistics.numSets ; ++i)
 	{
 		for(j = 0; j < cacheStatistics.associativity; ++i)

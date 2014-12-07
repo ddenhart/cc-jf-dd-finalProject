@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "CacheSimulator.h"
-//#include "mesif.h"
 #include "output.h"
 
 
@@ -74,93 +73,6 @@ unsigned int GetLineAddress(unsigned int address)
 
 	return address;
 }
-
-
-#if 0
-/* ==================================================================================
-	Function name:	handleInputs
- 	Arguments:		char* argv
-	Returns:		char*
-	Description:	Read command line arguments and do error check
-================================================================================== */
-char* handleInputs(char **argv, int argc, char* filename)
-{
-	/* 
-	   ----------------------------------------------
-		Argv[0] = executable
-	 	Argv[1] = number of sets (store in cacheStatistics.numSets)
-	 	Argv[2] = line size in bytes (store in cacheStatistics.lineSize)
-	 	Argv[3] = cache associativity (store in cacheStatistics.associativity)
-	 	Argv[4] = trace file name (store in filename)
-	*/
-
-	int badInput = TRUE;
-	char delim = ' ';
-	long int arg[3]; 			// array for storing the trace file name
-	char inputs[INPUT_BUFFER_SIZE];
-	char *reInputs[5];
-
-	if(argc != 5)
-	{
-		argc = 0;
-		//let user keep trying until good input
-		while(badInput)
-			fprintf(stderr, "Usage: %s	#Sets	Line size in bytes	Associativity	Trace file name		Debug flag\n", argv[0]);
-			if( (fgets(inputs, INPUT_BUFFER_SIZE, stdin) != NULL ) ) 
-			{
-				// get the first string
-				reInputs[argc] = strtok(inputs, &delim);
-				argc++;
-				/* walk through other tokens */
-				while( (reInputs[argc] != NULL) && (argc < 4) ) 
-				{
-					reInputs[argc] = strtok(NULL, &delim);
-					argc++;
-				}
-				if( (argc >= 4) && (argc >= 5))
-				{
-					badInput = FALSE;
-					arg[0] = atoll(reInputs[1]); //dd TODO: not sure atoll works in c
-					arg[1] = atoll(reInputs[2]);
-					arg[2] = atoll(reInputs[3]);
-					memset(filename, '\0', sizeof(filename));
-					strcpy(filename, reInputs[4]);
-					setCacheParams(arg);
-				}
-			}
-			
-	}
-	else
-	{
-		// Store command line arguments in proper variables
-		// ------------------------------------------------
-		arg[0] = atoll(argv[1]); //dd TODO: not sure atoll works in c
-		arg[1] = atoll(argv[2]);
-		arg[2] = atoll(argv[3]);
-		memset(filename, '\0', sizeof(filename));
-		strcpy(filename, argv[4]);
-		setCacheParams(arg);
-	}
-}
-
-
-/* ==================================================================================
-	Function name:	setCacheParams
- 	Arguments:		long int *arg
-	Returns:		void
-	Description:	set new parameters
-================================================================================== */
-void setCacheParams(long int *arg)
-{
-    cacheStatistics.numSets = arg[1];
-    cacheStatistics.lineSize = arg[2];
-    cacheStatistics.associativity = arg[3];
-    
-    // Compute and initialize all other cache attributes
-    cacheStatistics.numLines = cacheStatistics.numSets * cacheStatistics.associativity;	
-	cacheStatistics.cacheSize = cacheStatistics.numLines * cacheStatistics.lineSize ;	
-}
-#endif
 
 
 /*==================================================================================
@@ -360,15 +272,19 @@ int ValidateInputs()
 void ReadMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
-#ifndef SILENT
-	printf("Memory read from Address: %#x\n", address);
+#if SILENT
+    printf("\n------------------------------------------Read Memory---------\n");
+    printf("Memory read from Address: %#x", address);
+    printf("\n--------------------------------------------------------------\n\n");
 #endif
 }
 
 void WriteMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
-#ifndef SILENT
-	printf("Memory write to Address: %#x", address);
+#if SILENT
+    printf("\n------------------------------------------Write Memory--------\n");
+    printf("Memory write to Address: %#x", address);
+    printf("\n--------------------------------------------------------------\n\n");
 #endif
 }

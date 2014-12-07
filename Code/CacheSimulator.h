@@ -156,6 +156,7 @@ unsigned int GetMesifState(unsigned int set, unsigned int line);
 // Used to simulate a bus operation and to capture the 
 // snoop results of last level caches of other processors
 void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult);
+char *GetStateName(enum messif_state eState);
 
 // Inclusion Function
 void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned int evictedLineAddr);

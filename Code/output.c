@@ -74,8 +74,9 @@ void OutputValidLines()
 				mesifState = GetMesifState(i, j);
 				if(mesifState != eINVALID)
 				{
+                	char * str = GetStateName(cachePtr[i].setPtr[j].mesifBits);
 					// Print line contents and state
-					printf("Set %5u       Line %2u       Tag  %#8x       MESIF state: %2u\n", i, j, cachePtr[i].setPtr[j].tagBits, cachePtr[i].setPtr[j].mesifBits);
+					printf("Set %5u   Line %2u   Tag  %#8x   MESIF state: %s\n", i, j, cachePtr[i].setPtr[j].tagBits, str);
 					valid = 1;
 				}
 			}

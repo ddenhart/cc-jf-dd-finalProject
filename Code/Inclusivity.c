@@ -34,7 +34,7 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 	if((cmd == DATA_READ_REQ) || (cmd == DATA_WRITE_REQ) || (cmd == INSTR_READ_REQ))
 	{
 		// L3 needs to send 2*L2 line size bytes to L2, along with the lines addresses
-#ifndef SILENT
+#if SILENT
 		printf("L3 to L2: write %u bytes at address %#x\n", cacheStatistics.lineSize / 2, address);
 		printf("L3 to L2: write %u bytes at address %#x\n", cacheStatistics.lineSize / 2, address + (cacheStatistics.lineSize / 2));
 #endif
@@ -43,7 +43,7 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 		// L3 to L2 line size ratio = 2:1; L2 needs to invalidate 2 lines for every l3 line
 		if(*eviction)
 		{
-#ifndef SILENT
+#if SILENT
 			printf("L3 to L2: invalidate line at address %#x\n", evictedLineAddr);
 			printf("L3 to L2: invalidate line at address %#x\n\n", evictedLineAddr + (cacheStatistics.lineSize / 2));
 #endif
@@ -53,7 +53,7 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 	// L2 needs to invalidate the lines, if present in L2 cache
 	else if((cmd == SNOOPED_INVALIDATE) || (cmd == SNOOPED_RWIM))
 	{
-#ifndef SILENT
+#if SILENT
 		printf("L3 to L2: invalidate line at address %#x\n", address);
 		printf("L3 to L2: invalidate line at address %#x\n\n", address + (cacheStatistics.lineSize / 2));
 #endif
@@ -62,13 +62,13 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 	// L2 needs to invalidate all lines
 	else if(cmd == CLEAR_CACHE)
 	{
-#ifndef SILENT
+#if SILENT
 		printf("L3 to L2: invalidate all lines\n\n");
 #endif
 	}
 	else
 	{
-#ifndef SILENT
+#if SILENT
 		printf("No message to send to L2\n");
 #endif
 	}

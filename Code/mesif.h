@@ -103,7 +103,7 @@ unsigned int valid_SYS_Codes[][eCOL_MAX] = {
         {eSB_READ, eSB_HIT, eSB_FORWARD},           //3:F->S,E->S
         {eSB_RFO, eSB_HITM, eSB_WRITEBACK},         //4:M->I
         {eSB_READ, eSB_HITM, eSB_WRITEBACK},        //5:M->S
-        {eSB_READ, eCB_DONTCARE, eCB_DONTCARE}      //6:S->S
+        {eSB_READ, eSB_DONTCARE, eSB_DONTCARE}      //6:S->S
 };
 
 enum SYS_Rows {
@@ -150,7 +150,22 @@ struct mesif_params
     int sCol_done[MAX_STATE_COMBO];  //keeps track of if events have occured
 }sMesifBits;
 
+struct mesif_stats
+{
+    int toM;
+    int toE;
+    int toS;
+    int toI;
+    int toF;
+};
 
+struct mesif_stats fromM;
+struct mesif_stats fromE;
+struct mesif_stats fromS;
+struct mesif_stats fromI;
+struct mesif_stats fromF;
+
+int errorCount;
 void cleanMesif();
 void InitError();
 // Used to simulate the reporting of snoop results by other caches
@@ -165,8 +180,11 @@ enum mesif_err  StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesi
 enum mesif_err SetMesifState(enum Mesif_states eState);
 enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol);
 enum mesif_err CommandMux(enum messif_state eCurrent);
-void PrintError(enum mesif_err eError);
-void PrintEvent();
+void PrintError(enum mesif_err eError, enum messif_state eCurrent);
+
+void printState(enum messif_state eCurrent, enum messif_state eNext);
+//char *GetStateName(enum messif_state eState);
+char *GetCodeName(int code);
 
 //function prototypes for each action 
 enum mesif_err actionM_Read(enum mesif_type eFlag);
@@ -220,7 +238,7 @@ enum mesif_err actionF_NOHIT(enum mesif_type eFlag);
 enum mesif_err actionF_HIT(enum mesif_type eFlag);
 enum mesif_err actionF_HITM(enum mesif_type eFlag);
 enum mesif_err actionF_Invalidate(enum mesif_type eFlag);
-//enum mesif_err actionF_Forward(enum mesif_type eFlag);
+enum mesif_err actionF_Forward(enum mesif_type eFlag);
 enum mesif_err actionF_Memread(enum mesif_type eFlag);
 enum mesif_err actionF_Writeback(enum mesif_type eFlag);
 
