@@ -1221,15 +1221,15 @@ void printState(enum messif_state eCurrent, enum messif_state eNext)
 #if DEBUG
     printf("\n\n------------------------------------------Transition Count-------------------\n");
     printf("ErrorCount: %d\n", errorCount);
-    printf("M->M: %d\tM->E: %d\tM->S: %d\tM->I: %d\tM->F: %d\n",
+    printf("M->M: %d  \tM->E: %d  \tM->S: %d  \tM->I: %d  \tM->F: %d\n",
            fromM.toM, fromM.toE, fromM.toS, fromM.toI, fromM.toF);
-    printf("E->M: %d\tI->E: %d\tE->S: %d\tE->I: %d\tE->F: %d\n",
+    printf("E->M: %d  \tI->E: %d  \tE->S: %d  \tE->I: %d  \tE->F: %d\n",
            fromE.toM, fromE.toE, fromE.toS, fromE.toI, fromE.toF);
-    printf("S->M: %d\tS->E: %d\tS->S: %d\tS->I: %d\tS->F: %d\n",
+    printf("S->M: %d  \tS->E: %d  \tS->S: %d  \tS->I: %d  \tS->F: %d\n",
            fromS.toM, fromS.toE, fromS.toS, fromS.toI, fromS.toF);
-    printf("I->M: %d\tI->E: %d\tI->S: %d\tI->I: %d\tI->F: %d\n",
+    printf("I->M: %d  \tI->E: %d  \tI->S: %d  \tI->I: %d  \tI->F: %d\n",
            fromI.toM, fromI.toE, fromI.toS, fromI.toI, fromI.toF);
-    printf("F->M: %d\tF->E: %d\tF->S: %d\tF->I: %d\tF->F: %d\n",
+    printf("F->M: %d  \tF->E: %d  \tF->S: %d  \tF->I: %d  \tF->F: %d\n",
            fromF.toM, fromF.toE, fromF.toS, fromF.toI, fromF.toF);
     printf("\n-----------------------------------------------------------------------------\n");
 #endif
