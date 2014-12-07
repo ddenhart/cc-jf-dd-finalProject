@@ -22,7 +22,7 @@ integer and returning the appropriate values to other functions.
 #include <stdio.h>
 #include "parse.h"
 #include "CacheSimulator.h"
-#include "victimCache.h"
+#include "writeBuffer.h"
 
 //TODO JF:  Contact faust about if we are going to need to check the file.
 int ParseFile(char * Filename)
@@ -67,7 +67,7 @@ int ParseFile(char * Filename)
 			++victimCounter;
 			if (victimCounter > 2)
 			{
-				victimReturn = victimCache(0, 0, victimCounter);
+				victimReturn = writeBuffer(0, 0, victimCounter);
 				if (victimReturn == -1)
 					return -1;
 				victimCounter = 0;

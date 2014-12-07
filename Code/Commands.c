@@ -21,7 +21,7 @@
 #include <string.h>				// string handling
 #include "CacheSimulator.h" 
 #include "output.h"
-#include "victimCache.h"
+#include "writeBuffer.h"
 
 /* ==================================================================================
 	Function name:	ExecuteCommands02
@@ -30,7 +30,7 @@
 	Description: read request from L2 data cache, read request from L2 instruction cache
    ================================================================================== */
 
-//TODO JF: Should we run the parser again on the returned address from the victim cache?  I don't see why you would, especially since it is already done, and at that point you are just looking for
+//TODO JF: Should we run the parser again on the returned address from the write buffer?  I don't see why you would, especially since it is already done, and at that point you are just looking for
 // the data.
 //TODO JF: Get the Update Mesif state function from Deb
 int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddress)
@@ -46,9 +46,7 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	int baseAddress = 0;
 	unsigned int eviction = 0;
 
-	printf("Hex Address %x, %d\n", HexAddress, HexAddress);
-   baseAddress = GetLineAddress(HexAddress);
-	printf("Base Address %x, %d\n", baseAddress, baseAddress);
+	baseAddress = GetLineAddress(HexAddress);
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
@@ -57,8 +55,8 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 			++cacheStatistics.numHits;
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
-         cacheLine = setCount;
-         UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
+         	cacheLine = setCount;
+         	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			// MessageToL2();
 			//printf("Reading %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
@@ -72,22 +70,20 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;
 		++cacheStatistics.numReads;
-		checkVictim = victimCache(HexAddress, CHECK, 0);
-		printf("CHECK VICTIM: %d\n", checkVictim);
+		checkVictim = writeBuffer(HexAddress, CHECK, 0);
 		if (checkVictim > -1)
 			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
 		else if (checkVictim == -3)
 			return -1;
 		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED)  && (eviction == TRUE))
 		{
-			victimCache(cacheLine, INSERT, 0);
+			writeBuffer(cacheLine, INSERT, 0);
 		}
-      cachePtr[index].setPtr[cacheLine].tagBits = tag;
-      UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
-	  ReadMemory(HexAddress);
+     	cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  	ReadMemory(HexAddress);
 	}
 	// MessageToL2() Invalidate the line;
-	printf("\nTest\n");
 	return 0;
 }
 
@@ -119,7 +115,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 			++cacheStatistics.numAccesses;
 			++cacheStatistics.numReads;
 			cacheLine = setCount;
-         UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
+         	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_HIT);  //Update the MESIF State
 			//printf("Writing %d bytes starting at Address %d to L2 cache.\n", cacheStatistics.lineSize, HexAddress);
 			break;
 		}
@@ -132,25 +128,22 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;
 		++cacheStatistics.numReads;
-		checkVictim = victimCache(HexAddress, CHECK, 0);
+		checkVictim = writeBuffer(HexAddress, CHECK, 0);
 		if (checkVictim > -1)
 			HexAddress = checkVictim;			//Putting the address from the victim cache into the HexAddress.
 		else if (checkVictim == -3)
 			return -1;							//Return that there was an error in the buffer.
 		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED) && (eviction == TRUE))
 		{
-			victimCache(cacheLine, INSERT, 0);
-			for (int count = 0; count < VICTIM_CACHE_SIZE; ++count)
-				printf("\nVictim Cache %u \n", victimPtr.vCacheArray[count]);
+			writeBuffer(cacheLine, INSERT, 0);
 			//TODO JF: Put evicted line into Victim Cache;
 		}
-      cachePtr[index].setPtr[cacheLine].tagBits = tag;
-      UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
-	  WriteMemory(HexAddress);
+      	cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      	UpdateMesif(cmd, HexAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+	  	WriteMemory(HexAddress);
 	}
 	// MessageToL2();
 	return 0;
-	printf("\nCommand 1\n");
 }
 
 

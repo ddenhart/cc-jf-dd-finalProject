@@ -246,15 +246,15 @@ int CreateCache()
 		}
 	}
 
-	if ((victimPtr.vCacheArray = (struct vCache_C*)calloc(VICTIM_CACHE_SIZE, sizeof(struct vCache_C))) == NULL)
+	/*if ((victimPtr.vCacheArray = (struct vCache_C*)calloc(VICTIM_CACHE_SIZE, sizeof(struct vCache_C))) == NULL)
 	{
 		fprintf(stderr, "In function %s, line %d: calloc failed to allocate memory for Victim Cache\n", __FUNCTION__, __LINE__);
 		return -1;
-	}
+	}*/
 
-	for (i = 0; i < VICTIM_CACHE_SIZE; ++i)
+	for (i = 0; i < WRITE_BUFFER_SIZE; ++i)
 	{
-		victimPtr.vCacheArray[i] = -1;
+		writePtr.wBufferArray[i] = -1;
 	}
 	
 	// Create binary search array for pseudo LRU algorithm

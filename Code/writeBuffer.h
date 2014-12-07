@@ -8,14 +8,14 @@ Jeremiah Franke
 
 ==================================================================================
 
-File: 			victimCache.h
+File: 			writeBuffer.h
 Date:			11/16/2014
 Author:			Jeremiah Franke
 Modified:		Jeremiah Franke 12/04/2014
 Description: 	This file contains:
--The prototypes for the victim cache.
+-The prototypes for the write buffer.
 
 ================================================================================== */
 
 
-int victimCache(unsigned int fullAddress, int action, int trigger);
+int writeBuffer(long long int fullAddress, int action, int trigger);

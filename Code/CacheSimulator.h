@@ -31,7 +31,7 @@ Description: 	This file contains:
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
 #define INPUT_BUFFER_SIZE 	100
-#define VICTIM_CACHE_SIZE	8
+#define WRITE_BUFFER_SIZE	8
 
 // Trace File Commands
 #define DATA_READ_REQ		0		// Command 0 = read request from L2 data cache
@@ -61,7 +61,7 @@ Description: 	This file contains:
 
 //#define ALWAYS				1  //For the two utility prototypes.
 
-// victimCache actions
+// write buffer actions
 #define INSERT				0
 #define CHECK				1
 
@@ -82,7 +82,7 @@ enum Mesif_states {
 
 // Cache victim struct
 struct vCache_C {
-	long int * vCacheArray;				//Victim Array Buffer
+	long long int wBufferArray[WRITE_BUFFER_SIZE];	//Write Array Buffer
 } vCache;
 
 // Cache statistics struct
@@ -115,7 +115,7 @@ struct set_t {
 
 // Cache (dynamic array of set structs)
 struct set_t * cachePtr;			// Cache = array of sets
-struct vCache_C victimPtr;			// Victim Pointer
+struct vCache_C writePtr;			// write Pointer
 
 // Dynamic array for pseudo LRU binary search
 int * binarySearchArray;			
