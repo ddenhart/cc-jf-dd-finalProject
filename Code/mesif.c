@@ -1218,12 +1218,15 @@ void printState(enum messif_state eCurrent, enum messif_state eNext)
     printf("Command: %d, Address: %#x, Set: %d, Line: %d\n",
            sMesifBits.cmd, sMesifBits.address, sMesifBits.set, sMesifBits.line);
     printf("Event Code: %s/ %s/ %s, ", code1, code2, code3);
+    printf("\n--------------------------------------------------------------\n");
+#endif
+
 #if DEBUG
-    printf("\n\n------------------------------------------Transition Count-------------------\n");
+    printf("\n\n------------------------------------------Transition Count-------------\n");
     printf("ErrorCount: %d\n", errorCount);
     printf("M->M: %d  \tM->E: %d  \tM->S: %d  \tM->I: %d  \tM->F: %d\n",
            fromM.toM, fromM.toE, fromM.toS, fromM.toI, fromM.toF);
-    printf("E->M: %d  \tI->E: %d  \tE->S: %d  \tE->I: %d  \tE->F: %d\n",
+    printf("E->M: %d  \tE->E: %d  \tE->S: %d  \tE->I: %d  \tE->F: %d\n",
            fromE.toM, fromE.toE, fromE.toS, fromE.toI, fromE.toF);
     printf("S->M: %d  \tS->E: %d  \tS->S: %d  \tS->I: %d  \tS->F: %d\n",
            fromS.toM, fromS.toE, fromS.toS, fromS.toI, fromS.toF);
@@ -1231,9 +1234,7 @@ void printState(enum messif_state eCurrent, enum messif_state eNext)
            fromI.toM, fromI.toE, fromI.toS, fromI.toI, fromI.toF);
     printf("F->M: %d  \tF->E: %d  \tF->S: %d  \tF->I: %d  \tF->F: %d\n",
            fromF.toM, fromF.toE, fromF.toS, fromF.toI, fromF.toF);
-    printf("\n-----------------------------------------------------------------------------\n");
-#endif
-    printf("\n--------------------------------------------------------------\n");
+    printf("\n-----------------------------------------------------------------------\n");
 #endif
 }
 
@@ -1592,6 +1593,11 @@ enum mesif_err actionM_Invalidate(enum mesif_type eFlag)
 		{
           eCol = eCOL_3;
           iEventCode[eCol] = eCB_DONTCARE;
+      }
+      if(eFlag == eSBUS)
+      {
+          eCol = eCOL_1;
+          iEventCode[eCol] = eSB_DONTCARE;
       }
 		else
 		{
