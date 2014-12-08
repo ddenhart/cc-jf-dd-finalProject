@@ -68,7 +68,8 @@ Description: 	This file contains:
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used
 //to initialize the bits
-enum Mesif_states {
+typedef enum Mesif_states
+{
 	eINVALID = 0, // Cache line is invalid
 	eMODIFIED = eINVALID + 1, // Only this cache has the line and the memory is stale
 	eEXCLUSIVE = eMODIFIED + 1, // Only this cache has the line and the memory is up to date 

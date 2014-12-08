@@ -34,7 +34,7 @@ Description: 	This file contains:
 #define errRow9 "the bus operation is not valid"
 
 // Bus operation types
-enum cpu_bus { 
+typedef enum cpu_bus { 
         eCB_READ = 10, // Bus Read
         eCB_WRITE = eCB_READ + 1, // Bus Write
 
@@ -51,7 +51,8 @@ enum cpu_bus {
 
 
 // Snoop result types
-enum system_bus {
+typedef enum system_bus
+{
         eSB_RFO = 20,
         eSB_READ = eSB_RFO + 1,
 	
@@ -66,7 +67,7 @@ enum system_bus {
 };
 
 
-enum eventColumn
+typedef enum eventColumn
 {
     eCOL_1 = 0,
     eCOL_2 = eCOL_1 + 1,
@@ -74,7 +75,8 @@ enum eventColumn
     eCOL_MAX = eCOL_3 +1
 };
 
-enum mesif_type{ 
+typedef enum mesif_type
+{
         eCBUS = 0,
         eSBUS = 1 };
 
@@ -87,7 +89,8 @@ unsigned int valid_CPU_Codes[][eCOL_MAX] = {
         {eCB_WRITE, eCB_DONTCARE, eCB_INVALIDATE}   //5:F->M, S->M
 };
 
-enum CPU_Rows {
+typedef enum CPU_Rows
+{
         eCROW_I_F = 0,
         eCROW_I_E = 1,
         eCROW_I_M_XF_M_XS_M_XF_M = 2,
@@ -106,7 +109,8 @@ unsigned int valid_SYS_Codes[][eCOL_MAX] = {
         {eSB_READ, eSB_DONTCARE, eSB_DONTCARE}      //6:S->S
 };
 
-enum SYS_Rows {
+typedef enum SYS_Rows
+{
         eSROW_I_I = 0,
         eSROW_S_I = 1,
         eSROW_F_I_XE_I = 2,
@@ -117,7 +121,7 @@ enum SYS_Rows {
 };
 
 //MESIF Error codes
-enum mesif_err
+typedef enum mesif_err
 {
     eNO_ERROR = 0,
     eINVALID_STATE_ERROR = eNO_ERROR -1,      //the state machine has an unassigned state

@@ -247,9 +247,9 @@ unsigned int GetSnoopResult(unsigned int Address, enum messif_state eCurrent)
 {
     enum mesif_err eError = eNO_ERROR;
 
-    int firstHalf = Address & 0xFFFF0000;
-    int secondHalf = Address & 0x0000FFFF;
-    int modRes = 0;
+    unsigned int firstHalf = Address & 0xFFFF0000;
+    unsigned int secondHalf = Address & 0x0000FFFF;
+    unsigned int modRes = 0;
     unsigned int snoopResult = 0;
     sMesifBits.sCol_done[eCOL_2] = TRUE;
 
