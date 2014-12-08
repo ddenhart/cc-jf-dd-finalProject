@@ -46,7 +46,7 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	unsigned int setCount = 0;
 	unsigned int baseEvict = 0;
 	unsigned int baseAddress = 0;
-	unsigned int eviction = 0;
+	int eviction = 0;
 
 	//unsigned int baseIndex = index << (ConvertToBase(cacheStatistics.lineSize));
 	//unsigned int baseTag = tag << (ConvertToBase(baseIndex));
@@ -109,7 +109,7 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	unsigned int setCount = 0;
 	unsigned int baseEvict = 0;
 	unsigned int baseAddress = 0;
-	unsigned int eviction = 0;
+	int eviction = 0;
 
 	baseAddress = GetLineAddress(HexAddress);
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
@@ -171,7 +171,7 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 	int checkVictim = 0;
 	int foundFlag = FALSE;
 	int message = FALSE;
-	unsigned int eviction = 0;
+	int eviction = 0;
 
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
@@ -257,7 +257,7 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 	int checkVictim = 0;
 	int foundFlag = FALSE;
 	int message = FALSE;
-	unsigned int eviction = 0;
+	int eviction = 0;
 
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
