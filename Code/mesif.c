@@ -34,9 +34,9 @@ Description: 	This file contains:
 ================================================================================== */
 void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsigned int line, int found)
 {
-    enum mesif_err eError = eNO_ERROR;
-    enum Mesif_states eNext = eMAX_STATES;
-    enum Mesif_states eCurrent = eMAX_STATES;
+    enum mesif_err_t eError = eNO_ERROR;
+    enum Mesif_states_t eNext = eMAX_STATES;
+    enum Mesif_states_t eCurrent = eMAX_STATES;
 
     sMesifBits.address = address;
     sMesifBits.cmd = cmd;
@@ -170,18 +170,18 @@ void InitError()
 BusOperation:	Used to simulate a bus operation and to capture the 
 				snoop results of last level caches of other processors
 
-@input:			enum cpu_bus BusOp 
+@input:			enum cpu_bus_t BusOp 
 				unsigned int Address 
-				enum system_bus *SnoopResult
+				enum system_bus_t *SnoopResult
 
 @output:		None
 
 ================================================================================== */
 void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult)
 {
-    enum mesif_err eError = eNO_ERROR;
-    enum Mesif_states eNext = eMAX_STATES;
-    enum Mesif_states eCurrent = eMAX_STATES;
+    enum mesif_err_t eError = eNO_ERROR;
+    enum Mesif_states_t eNext = eMAX_STATES;
+    enum Mesif_states_t eCurrent = eMAX_STATES;
 
     sMesifBits.address = Address;
 
@@ -240,12 +240,12 @@ GetSnoopResult: Used to simulate the reporting of snoop results by other caches
 
 @input:			unsigned int Address
 
-@output:		enum system_bus
+@output:		enum system_bus_t
 
 ================================================================================== */
-unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states eCurrent)
+unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states_t eCurrent)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
 
     unsigned int firstHalf = Address & 0xFFFF0000;
     unsigned int secondHalf = Address & 0x0000FFFF;
@@ -352,7 +352,7 @@ PutSnoopResult:	Used to report the result of our snooping bus
 				operations by other caches 
 
 @input:			unsigned int Address
-				enum system_bus SnoopResult
+				enum system_bus_t SnoopResult
 
 @output:		None
 
@@ -374,7 +374,7 @@ void PutSnoopResult(unsigned int Address, unsigned int SnoopResult)
 	Returns:		void
 	Description:	Read the line MESIF state
    ================================================================================== */
-enum Mesif_states GetCurrentState()
+enum Mesif_states_t GetCurrentState()
 {
     return cachePtr[sMesifBits.set].setPtr[sMesifBits.line].mesifBits;
 }
@@ -394,9 +394,9 @@ unsigned int GetMesifState(unsigned int set, unsigned int line)
 @output: 
 
 ================================================================================== */
-enum Mesif_states GetHitMiss(int found, enum Mesif_states eCurrent)
+enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
 
     sMesifBits.sCol_done[1] = TRUE;
 
@@ -463,9 +463,9 @@ enum Mesif_states GetHitMiss(int found, enum Mesif_states eCurrent)
 @output: 
 
 ================================================================================== */
-enum mesif_err SetMesifState(enum Mesif_states eState)
+enum mesif_err_t SetMesifState(enum Mesif_states_t eState)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
 
     if((cachePtr) && (cachePtr[sMesifBits.set].setPtr))
     {
@@ -488,9 +488,9 @@ enum mesif_err SetMesifState(enum Mesif_states eState)
 @output: 
 
 ================================================================================== */
-enum mesif_err StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesif_states *eNext)
+enum mesif_err_t StateSelect(int iStateRow, enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
 
     switch(eCurrent)
     {
@@ -711,9 +711,9 @@ enum mesif_err StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesif
 @output:
 
 ================================================================================== */
-enum mesif_err eventCodeCheck(enum Mesif_states eCurrent, enum Mesif_states *eNext)
+enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iRow = 0;
 
     iRow = compareCodes();
@@ -832,9 +832,9 @@ int compareCodes()
 @output:
 
 ================================================================================== */
-enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol)
+enum mesif_err_t UpdateEvents(int *iEventCode, enum eventColumn_t eCol)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     
     if(iEventCode &&
        (eCol >= 0) && (eCol < MAX_STATE_COMBO))
@@ -858,9 +858,9 @@ enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol)
 @output:
 
 ================================================================================== */
-enum mesif_err CommandMux(enum Mesif_states eCurrent)
+enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
 
     switch(sMesifBits.cmd)
     {
@@ -1174,7 +1174,7 @@ enum mesif_err CommandMux(enum Mesif_states eCurrent)
 @output:
 
 ================================================================================== */
-void PrintError(enum mesif_err eError, enum Mesif_states eCurrent)
+void PrintError(enum mesif_err_t eError, enum Mesif_states_t eCurrent)
 {
     int index = abs(eError);
     char* strCurrent = GetStateName(eCurrent);
@@ -1204,7 +1204,7 @@ void PrintError(enum mesif_err eError, enum Mesif_states eCurrent)
 }
 
 
-void printState(enum Mesif_states eCurrent, enum Mesif_states eNext)
+void printState(enum Mesif_states_t eCurrent, enum Mesif_states_t eNext)
 {
 #if SILENT 
     char* strCurrent = GetStateName(eCurrent);
@@ -1238,7 +1238,7 @@ void printState(enum Mesif_states eCurrent, enum Mesif_states eNext)
 #endif
 }
 
-char *GetStateName(enum Mesif_states eState)
+char *GetStateName(enum Mesif_states_t eState)
 {
     char* str;
 
@@ -1334,9 +1334,9 @@ char *GetCodeName(int code)
 @output: 
 
 ================================================================================== */
-enum mesif_err actionM_Read(enum mesif_type eFlag)
+enum mesif_err_t actionM_Read(enum mesif_type_t eFlag)
 {
-	enum mesif_err eError = eNO_ERROR;
+	enum mesif_err_t eError = eNO_ERROR;
    int iEventCode[] = {0, 0, 0};
 	
     if (iEventCode)
@@ -1376,9 +1376,9 @@ enum mesif_err actionM_Read(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_Write(enum mesif_type eFlag)
+enum mesif_err_t actionM_Write(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1414,11 +1414,11 @@ enum mesif_err actionM_Write(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_RFO(enum mesif_type eFlag)
+enum mesif_err_t actionM_RFO(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -1459,9 +1459,9 @@ enum mesif_err actionM_RFO(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_NOHIT(enum mesif_type eFlag)
+enum mesif_err_t actionM_NOHIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1497,9 +1497,9 @@ enum mesif_err actionM_NOHIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_HIT(enum mesif_type eFlag)
+enum mesif_err_t actionM_HIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1539,9 +1539,9 @@ enum mesif_err actionM_HIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_HITM(enum mesif_type eFlag)
+enum mesif_err_t actionM_HITM(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1581,11 +1581,11 @@ enum mesif_err actionM_HITM(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_Invalidate(enum mesif_type eFlag)
+enum mesif_err_t actionM_Invalidate(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -1626,9 +1626,9 @@ enum mesif_err actionM_Invalidate(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_Memread(enum mesif_type eFlag)
+enum mesif_err_t actionM_Memread(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -1664,9 +1664,9 @@ enum mesif_err actionM_Memread(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionM_Writeback(enum mesif_type eFlag)
+enum mesif_err_t actionM_Writeback(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -1702,9 +1702,9 @@ enum mesif_err actionM_Writeback(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_Read(enum mesif_type eFlag)
+enum mesif_err_t actionE_Read(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1744,9 +1744,9 @@ enum mesif_err actionE_Read(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_Write(enum mesif_type eFlag)
+enum mesif_err_t actionE_Write(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1782,11 +1782,11 @@ enum mesif_err actionE_Write(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_RFO(enum mesif_type eFlag)
+enum mesif_err_t actionE_RFO(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -1827,9 +1827,9 @@ enum mesif_err actionE_RFO(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_NOHIT(enum mesif_type eFlag)
+enum mesif_err_t actionE_NOHIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1865,9 +1865,9 @@ enum mesif_err actionE_NOHIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_HIT(enum mesif_type eFlag)
+enum mesif_err_t actionE_HIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1907,9 +1907,9 @@ enum mesif_err actionE_HIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_HITM(enum mesif_type eFlag)
+enum mesif_err_t actionE_HITM(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -1945,11 +1945,11 @@ enum mesif_err actionE_HITM(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_Invalidate(enum mesif_type eFlag)
+enum mesif_err_t actionE_Invalidate(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -1990,9 +1990,9 @@ enum mesif_err actionE_Invalidate(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_Forward(enum mesif_type eFlag)
+enum mesif_err_t actionE_Forward(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2028,9 +2028,9 @@ enum mesif_err actionE_Forward(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionE_Memread(enum mesif_type eFlag)
+enum mesif_err_t actionE_Memread(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2066,9 +2066,9 @@ enum mesif_err actionE_Memread(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Read(enum mesif_type eFlag)
+enum mesif_err_t actionS_Read(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2108,9 +2108,9 @@ enum mesif_err actionS_Read(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Write(enum mesif_type eFlag)
+enum mesif_err_t actionS_Write(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2144,11 +2144,11 @@ enum mesif_err actionS_Write(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_RFO(enum mesif_type eFlag)
+enum mesif_err_t actionS_RFO(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -2189,9 +2189,9 @@ enum mesif_err actionS_RFO(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_NOHIT(enum mesif_type eFlag)
+enum mesif_err_t actionS_NOHIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2231,9 +2231,9 @@ enum mesif_err actionS_NOHIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_HIT(enum mesif_type eFlag)
+enum mesif_err_t actionS_HIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2273,9 +2273,9 @@ enum mesif_err actionS_HIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_HITM(enum mesif_type eFlag)
+enum mesif_err_t actionS_HITM(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2315,11 +2315,11 @@ enum mesif_err actionS_HITM(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Invalidate(enum mesif_type eFlag)
+enum mesif_err_t actionS_Invalidate(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -2360,9 +2360,9 @@ enum mesif_err actionS_Invalidate(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Forward(enum mesif_type eFlag)
+enum mesif_err_t actionS_Forward(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2398,9 +2398,9 @@ enum mesif_err actionS_Forward(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Memread(enum mesif_type eFlag)
+enum mesif_err_t actionS_Memread(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2436,9 +2436,9 @@ enum mesif_err actionS_Memread(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionS_Writeback(enum mesif_type eFlag)
+enum mesif_err_t actionS_Writeback(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2474,9 +2474,9 @@ enum mesif_err actionS_Writeback(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Read(enum mesif_type eFlag)
+enum mesif_err_t actionI_Read(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2516,9 +2516,9 @@ enum mesif_err actionI_Read(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Write(enum mesif_type eFlag)
+enum mesif_err_t actionI_Write(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2558,11 +2558,11 @@ enum mesif_err actionI_Write(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_RFO(enum mesif_type eFlag)
+enum mesif_err_t actionI_RFO(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if(iEventCode)
 	{
@@ -2603,9 +2603,9 @@ enum mesif_err actionI_RFO(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_NOHIT(enum mesif_type eFlag)
+enum mesif_err_t actionI_NOHIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2645,9 +2645,9 @@ enum mesif_err actionI_NOHIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_HIT(enum mesif_type eFlag)
+enum mesif_err_t actionI_HIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2687,9 +2687,9 @@ enum mesif_err actionI_HIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_HITM(enum mesif_type eFlag)
+enum mesif_err_t actionI_HITM(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2725,9 +2725,9 @@ enum mesif_err actionI_HITM(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Memread(enum mesif_type eFlag)
+enum mesif_err_t actionI_Memread(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
@@ -2763,9 +2763,9 @@ enum mesif_err actionI_Memread(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Invalidate(enum mesif_type eFlag)
+enum mesif_err_t actionI_Invalidate(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2801,9 +2801,9 @@ enum mesif_err actionI_Invalidate(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Forward(enum mesif_type eFlag)
+enum mesif_err_t actionI_Forward(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2839,9 +2839,9 @@ enum mesif_err actionI_Forward(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionI_Writeback(enum mesif_type eFlag)
+enum mesif_err_t actionI_Writeback(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -2878,9 +2878,9 @@ enum mesif_err actionI_Writeback(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_Read(enum mesif_type eFlag)
+enum mesif_err_t actionF_Read(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2921,9 +2921,9 @@ enum mesif_err actionF_Read(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_Write(enum mesif_type eFlag)
+enum mesif_err_t actionF_Write(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -2959,11 +2959,11 @@ enum mesif_err actionF_Write(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_RFO(enum mesif_type eFlag)
+enum mesif_err_t actionF_RFO(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -3004,9 +3004,9 @@ enum mesif_err actionF_RFO(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_NOHIT(enum mesif_type eFlag)
+enum mesif_err_t actionF_NOHIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -3042,9 +3042,9 @@ enum mesif_err actionF_NOHIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_HIT(enum mesif_type eFlag)
+enum mesif_err_t actionF_HIT(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -3084,9 +3084,9 @@ enum mesif_err actionF_HIT(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_HITM(enum mesif_type eFlag)
+enum mesif_err_t actionF_HITM(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
 	if (iEventCode)
@@ -3122,11 +3122,11 @@ enum mesif_err actionF_HITM(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_Invalidate(enum mesif_type eFlag)
+enum mesif_err_t actionF_Invalidate(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
-    enum eventColumn eCol;
+    enum eventColumn_t eCol;
 
 	if (iEventCode)
 	{
@@ -3167,9 +3167,9 @@ enum mesif_err actionF_Invalidate(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_Forward(enum mesif_type eFlag)
+enum mesif_err_t actionF_Forward(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -3205,9 +3205,9 @@ enum mesif_err actionF_Forward(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err actionF_Memread(enum mesif_type eFlag)
+enum mesif_err_t actionF_Memread(enum mesif_type_t eFlag)
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
 
     if(iEventCode)
@@ -3243,9 +3243,9 @@ enum mesif_err actionF_Memread(enum mesif_type eFlag)
 @output:
 
 ================================================================================== */
-enum mesif_err action_DoNothing()
+enum mesif_err_t action_DoNothing()
 {
-    enum mesif_err eError = eNO_ERROR;
+    enum mesif_err_t eError = eNO_ERROR;
     int dontcare = 0;
     int nothing[MAX_STATE_COMBO];
 

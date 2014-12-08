@@ -47,7 +47,7 @@ typedef enum cpu_bus {
 
         eCB_DONTCARE = eCB_INVALIDATE + 1,
         eCB__MAX_EVENTS = eCB_DONTCARE + 1
-};
+}cpu_bus_t;
 
 
 // Snoop result types
@@ -64,7 +64,7 @@ typedef enum system_bus
 
         eSB_DONTCARE = eSB_FORWARD + 1,
         eSB_MAX_EVENTS = eSB_DONTCARE + 1
-};
+}system_bus_t;
 
 
 typedef enum eventColumn
@@ -73,12 +73,13 @@ typedef enum eventColumn
     eCOL_2 = eCOL_1 + 1,
     eCOL_3 = eCOL_2 + 1,
     eCOL_MAX = eCOL_3 +1
-};
+}eventColumn_t;
 
 typedef enum mesif_type
 {
         eCBUS = 0,
-        eSBUS = 1 };
+        eSBUS = 1 
+}mesif_type_t;
 
 unsigned int valid_CPU_Codes[][eCOL_MAX] = {
         {eCB_READ, eCB_HIT, eCB_MEMREAD},           //0:I->F
@@ -97,7 +98,7 @@ typedef enum CPU_Rows
         eCROW_M_M_XE_M = 3,
         eCROW_M_M_XF_F_XS_S_XE_E = 4,
         eCROW_F_M_XS_M = 5
-};
+}CPU_Rows_t;
 
 unsigned int valid_SYS_Codes[][eCOL_MAX] = {
         {eSB_DONTCARE, eSB_DONTCARE, eSB_DONTCARE}, //0:I->I
@@ -118,7 +119,7 @@ typedef enum SYS_Rows
         eSROW_M_I = 4,
         eSROW_M_S = 5,
         eSROW_S_S = 6
-};
+}SYS_Rows_t;
 
 //MESIF Error codes
 typedef enum mesif_err
@@ -133,7 +134,7 @@ typedef enum mesif_err
     eINVALID_COMMAND = eSYNTAX_NULL_ERROR -1, //out of range command 
     eINVALID_SNOOP = eINVALID_COMMAND -1,     //the snoop result is not valid
     eINVALID_BUS_OP = eINVALID_SNOOP -1       //the bus operation is not valid
-};
+}mesif_err_t;
 
 
 //MESIF Error table
@@ -149,7 +150,7 @@ struct mesif_params
     unsigned int cmd;   //the incoming command
     unsigned int set;   //the affected set in the cache
     unsigned int line;  //the affected line in the cache
-    enum mesif_type eFlag;  //either from the cpu or the system
+    enum mesif_type_t eFlag;  //either from the cpu or the system
     int iEventCode[MAX_STATE_COMBO];    //a list of events that determine the next state
     int sCol_done[MAX_STATE_COMBO];  //keeps track of if events have occured
 }sMesifBits;
@@ -173,80 +174,80 @@ int errorCount;
 void cleanMesif();
 void InitError();
 // Used to simulate the reporting of snoop results by other caches
-unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states eCurrent);
+unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states_t eCurrent);
 void PutSnoopResult(unsigned int Address, unsigned int SnoopResult);
-enum mesif_err eventCodeCheck(enum Mesif_states eCurrent, enum Mesif_states *eNext);
+enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext);
 //Read the line MESIF state
-enum Mesif_states GetCurrentState();
+enum Mesif_states_t GetCurrentState();
 int compareCodes();
-enum Mesif_states GetHitMiss(int found, enum Mesif_states eCurrent);
-enum mesif_err  StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesif_states *eNext);
-enum mesif_err SetMesifState(enum Mesif_states eState);
-enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol);
-enum mesif_err CommandMux(enum Mesif_states eCurrent);
-void PrintError(enum mesif_err eError, enum Mesif_states eCurrent);
+enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent);
+enum mesif_err_t  StateSelect(int iStateRow, enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext);
+enum mesif_err_t SetMesifState(enum Mesif_states_t eState);
+enum mesif_err_t UpdateEvents(int *iEventCode, enum eventColumn_t eCol);
+enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent);
+void PrintError(enum mesif_err_t eError, enum Mesif_states_t eCurrent);
 
-void printState(enum Mesif_states eCurrent, enum Mesif_states eNext);
-//char *GetStateName(enum Mesif_states eState);
+void printState(enum Mesif_states_t eCurrent, enum Mesif_states_t eNext);
+//char *GetStateName(enum Mesif_states_t eState);
 char *GetCodeName(int code);
 
 //function prototypes for each action 
-enum mesif_err actionM_Read(enum mesif_type eFlag);
-enum mesif_err actionM_Write(enum mesif_type eFlag);
-enum mesif_err actionM_RFO(enum mesif_type eFlag);
-enum mesif_err actionM_NOHIT(enum mesif_type eFlag);
-enum mesif_err actionM_HIT(enum mesif_type eFlag);
-enum mesif_err actionM_HITM(enum mesif_type eFlag);
-enum mesif_err actionM_Invalidate(enum mesif_type eFlag);
-//enum mesif_err actionM_Forward(enum mesif_type eFlag);
-enum mesif_err actionM_Memread(enum mesif_type eFlag);
-enum mesif_err actionM_Writeback(enum mesif_type eFlag);
+enum mesif_err_t actionM_Read(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_Write(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_RFO(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_NOHIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_HIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_HITM(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_Invalidate(enum mesif_type_t eFlag);
+//enum mesif_err_t actionM_Forward(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_Memread(enum mesif_type_t eFlag);
+enum mesif_err_t actionM_Writeback(enum mesif_type_t eFlag);
 
-enum mesif_err actionE_Read(enum mesif_type eFlag);
-enum mesif_err actionE_Write(enum mesif_type eFlag);
-enum mesif_err actionE_RFO(enum mesif_type eFlag);
-enum mesif_err actionE_NOHIT(enum mesif_type eFlag);
-enum mesif_err actionE_HIT(enum mesif_type eFlag);
-enum mesif_err actionE_HITM(enum mesif_type eFlag);
-enum mesif_err actionE_Invalidate(enum mesif_type eFlag);
-enum mesif_err actionE_Forward(enum mesif_type eFlag);
-enum mesif_err actionE_Memread(enum mesif_type eFlag);
-//enum mesif_err actionE_Writeback(enum mesif_type eFlag);
+enum mesif_err_t actionE_Read(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_Write(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_RFO(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_NOHIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_HIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_HITM(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_Invalidate(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_Forward(enum mesif_type_t eFlag);
+enum mesif_err_t actionE_Memread(enum mesif_type_t eFlag);
+//enum mesif_err_t actionE_Writeback(enum mesif_type_t eFlag);
 
-enum mesif_err actionS_Read(enum mesif_type eFlag);
-enum mesif_err actionS_Write(enum mesif_type eFlag);
-enum mesif_err actionS_RFO(enum mesif_type eFlag);
-enum mesif_err actionS_NOHIT(enum mesif_type eFlag);
-enum mesif_err actionS_HIT(enum mesif_type eFlag);
-enum mesif_err actionS_HITM(enum mesif_type eFlag);
-enum mesif_err actionS_Invalidate(enum mesif_type eFlag);
-enum mesif_err actionS_Forward(enum mesif_type eFlag);
-enum mesif_err actionS_Memread(enum mesif_type eFlag);
-enum mesif_err actionS_Writeback(enum mesif_type eFlag);
+enum mesif_err_t actionS_Read(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_Write(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_RFO(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_NOHIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_HIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_HITM(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_Invalidate(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_Forward(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_Memread(enum mesif_type_t eFlag);
+enum mesif_err_t actionS_Writeback(enum mesif_type_t eFlag);
 
-enum mesif_err actionI_Read(enum mesif_type eFlag);
-enum mesif_err actionI_Write(enum mesif_type eFlag);
-enum mesif_err actionI_RFO(enum mesif_type eFlag);
-enum mesif_err actionI_NOHIT(enum mesif_type eFlag);
-enum mesif_err actionI_HIT(enum mesif_type eFlag);
-enum mesif_err actionI_HITM(enum mesif_type eFlag);
-enum mesif_err actionI_Invalidate(enum mesif_type eFlag);
-enum mesif_err actionI_Forward(enum mesif_type eFlag);
-enum mesif_err actionI_Memread(enum mesif_type eFlag);
-enum mesif_err actionI_Writeback(enum mesif_type eFlag);
+enum mesif_err_t actionI_Read(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_Write(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_RFO(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_NOHIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_HIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_HITM(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_Invalidate(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_Forward(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_Memread(enum mesif_type_t eFlag);
+enum mesif_err_t actionI_Writeback(enum mesif_type_t eFlag);
 
-enum mesif_err actionF_Read(enum mesif_type eFlag);
-enum mesif_err actionF_Write(enum mesif_type eFlag);
-enum mesif_err actionF_RFO(enum mesif_type eFlag);
-enum mesif_err actionF_NOHIT(enum mesif_type eFlag);
-enum mesif_err actionF_HIT(enum mesif_type eFlag);
-enum mesif_err actionF_HITM(enum mesif_type eFlag);
-enum mesif_err actionF_Invalidate(enum mesif_type eFlag);
-enum mesif_err actionF_Forward(enum mesif_type eFlag);
-enum mesif_err actionF_Memread(enum mesif_type eFlag);
-enum mesif_err actionF_Writeback(enum mesif_type eFlag);
+enum mesif_err_t actionF_Read(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_Write(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_RFO(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_NOHIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_HIT(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_HITM(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_Invalidate(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_Forward(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_Memread(enum mesif_type_t eFlag);
+enum mesif_err_t actionF_Writeback(enum mesif_type_t eFlag);
 
-enum mesif_err action_DoNothing();
+enum mesif_err_t action_DoNothing();
 
 
 

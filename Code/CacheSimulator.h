@@ -76,7 +76,7 @@ typedef enum Mesif_states
 	eSHARED = eEXCLUSIVE + 1, // At least two other caches have the line and memory is up to date
 	eFORWARD = eSHARED + 1, // Cache line is in the shared state and this is the forwarding processor
 	eMAX_STATES = eFORWARD + 1
-};
+}Mesif_states_t;
 
 
 /*  DATA STRUCTURES  */
@@ -157,7 +157,7 @@ unsigned int GetMesifState(unsigned int set, unsigned int line);
 // Used to simulate a bus operation and to capture the 
 // snoop results of last level caches of other processors
 void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult);
-char *GetStateName(enum Mesif_states eState);
+char *GetStateName(enum Mesif_states_t eState);
 
 // Inclusion Function
 void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned int evictedLineAddr);
