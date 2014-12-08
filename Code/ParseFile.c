@@ -24,19 +24,15 @@ integer and returning the appropriate values to other functions.
 #include "CacheSimulator.h"
 #include "writeBuffer.h"
 
-//TODO JF:  Contact faust about if we are going to need to check the file.
+/* ==================================================================================
+Function name:	ParseFile
+Arguments:		char * Filename
+Returns:		0 for valid return, -1 for error
+Description:	This parses the trace file and passes the command and address
+				to the main part of the program.
+================================================================================== */
 int ParseFile(char * Filename)
 {
-	/* While not EOF
-	-----------------
-	Read line + error check
-	Parse line + eror check (See parsing algorithm)
-	Save command number in command variable
-	Save address index in set index variable
-	Save address tag in line tag variable
-	Examine command and choose command algorithm (See all commands algorithms)
-	Execute all steps in the appropriate command algorithm
-	*/
 	FILE * traceFile;				// file descriptor for trace file
 	unsigned int characterInLine;   // Variable to hold character in line
 	unsigned int operation;
@@ -46,74 +42,97 @@ int ParseFile(char * Filename)
 	int victimCounter = 0;
 	int victimReturn = 0;
 
-	traceFile = fopen(Filename, "r");
+	traceFile = fopen(Filename, "r");	//Open the file in read mode
 	if (traceFile == NULL)
 	{
-		fprintf(stderr, "fopen failed\n");
+		fprintf(stderr, "fopen failed\n");	//If it failed
 		exit(1);
 	}
 
 	while (1)
 	{
-		characterInLine = fgetc(traceFile);
-		if (feof(traceFile))
+		characterInLine = fgetc(traceFile);	//Get the first character in the file
+		if (feof(traceFile))	//If the end of file
 		{
 			lineHolder[counter] = '\0';
-			if ((isSpace == 0) && (counter > 0))
+			if ((isSpace == 0) && (counter > 0))	//If the counter is greater than zero, but there has not been a space, then at the end of the line at the end of the file.
 			{
+				writeBuffer(0, CLEAR, 0);	//Clear the buffer by writing out to the memory
 				break;
 			}
 			else
 			{
-				int returnValue = ProgramWrapper(lineHolder, operation);
+				int returnValue = ProgramWrapper(lineHolder, operation);	//Run the last line through the program
 				if (returnValue < 0)
 					return -1;
 			}
+			writeBuffer(0, CLEAR, 0);	//Clear the buffer by writing out to the memory
 			break;
 		}
-		if (characterInLine == '\n')
+		if (characterInLine == '\n')		//If new line character
 		{
-			++victimCounter;
-			if (victimCounter > 2)
+			++victimCounter;				//counter for the buffer as lines are read
+			if (victimCounter > 3)
 			{
-				victimReturn = writeBuffer(0, 0, victimCounter);
+				victimReturn = writeBuffer(0, 0, victimCounter);  //Write to memory the next address in the write buffer
 				if (victimReturn == -1)
 					return -1;
 				victimCounter = 0;
 			}
 			lineHolder[counter] = '\0';
-			int returnValue = ProgramWrapper(lineHolder, operation);
+			int returnValue = ProgramWrapper(lineHolder, operation);  //Run the program on the line that was created from the file
 			if (returnValue < 0)
 				return -1;
-			isSpace = 0;
+			isSpace = 0;					//Reset is space variable.
 			continue;
 		}
-		if (isspace(characterInLine))
+		if (isspace(characterInLine))		//If the character is a space
 		{
 			isSpace = 1;
-			counter = 0;
+			counter = 0;					//Reset the counter so the lineHolder can start new
 			continue;
 		}
 		if (!isSpace)
-			operation = characterInLine - '0';
+			operation = characterInLine - '0';	//If not a space, get the operation from the line
 		else
 			lineHolder[counter] = characterInLine;
 		++counter;
 	}
-	fclose(traceFile);
+	fclose(traceFile);							//Close the trace file
 	return 0;
 }
 
+/* ==================================================================================
+Function name:	ProgramWrapper
+Arguments:		char * HexAddress
+				unsigned int operation
+Returns:		0 for valid return, -1 for error
+Description:	This is the wrapper function that runs the cache program.
+================================================================================== */
 int ProgramWrapper(char * HexAddress, unsigned int operation)
 {
 	unsigned int tag = 0;
 	unsigned int index = 0;
 	unsigned int convertedHex = 0;
 
-	ParseHexAddress(HexAddress, &tag, &index, &convertedHex);
-	return CommandCentral(tag, index, operation, convertedHex);
+	ParseHexAddress(HexAddress, &tag, &index, &convertedHex);	//Run the parser on the address
+#if SILENT
+	printf("\n\n\n------------------------------------------Trace File Line-----\n");
+	printf("Command: %d  Address: %#x", operation, convertedHex);
+	printf("\n--------------------------------------------------------------\n\n");
+#endif
+	return CommandCentral(tag, index, operation, convertedHex);	//Return the value that comes from the command function, check to see if it is -1 to exit the program
 }
 
+/* ==================================================================================
+Function name:	CommandCentral
+Arguments:		unsigned int tag
+				unsigned int index
+				unsigned int operation
+				unsigned int HexAddress
+Returns:		0 for valid return, -1 for error
+Description:	Runs the commands depending on the command passed in from the wrapper function.
+================================================================================== */
 int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation, unsigned int HexAddress)
 {
 	switch (operation)
@@ -149,12 +168,20 @@ int CommandCentral(unsigned int tag, unsigned int index, unsigned int operation,
 	}
 }
 
+/* ==================================================================================
+Function name:	ParseHexAddress
+Arguments:		unsigned int * tag
+				unsigned int * index
+				char * HexAddress
+				unsigned int * convertedHex
+Returns:		0 for valid return, -1 for error
+Description:	Runs the commands depending on the command passed in from the wrapper function.
+================================================================================== */
 void ParseHexAddress(char * HexAddress, unsigned int * tag, unsigned int * index, unsigned int * convertedHex)
 {
 	unsigned int addressBaseTen = 0;
 
-	_set_printf_count_output(1);
-	sscanf(HexAddress, "%x", &addressBaseTen);
+	sscanf(HexAddress, "%x", &addressBaseTen);	//Convert the hex array to an unsigned integer
 	*convertedHex = addressBaseTen;
-	ParseAddress(&addressBaseTen, index, tag);
+	ParseAddress(&addressBaseTen, index, tag);	//Parse the address to get the tag and index
 }

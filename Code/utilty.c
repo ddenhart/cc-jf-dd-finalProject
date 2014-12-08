@@ -134,9 +134,9 @@ void SetLineTag(unsigned int set, unsigned int line, unsigned int * tag)
 
 /* ==================================================================================
 	Function name:	CreateCache
- 	Arguments:
+ 	Arguments:		None
 	Returns:		void
-	Description:
+	Description:	Initial creation of the cache
    ================================================================================== */
 int CreateCache()
 {
@@ -187,9 +187,9 @@ int CreateCache()
 
 /* ==================================================================================
 	Function name:	DestroyCache
- 	Arguments:
+ 	Arguments:		None
 	Returns:		void
-	Description:
+	Description:	Release all memory from the cache
    ================================================================================== */
 void DestroyCache()
 {
@@ -232,7 +232,7 @@ void InitParams()
 
 /* ==================================================================================
 	Function name:	ValidateInputs
- 	Arguments:
+ 	Arguments:		None
 	Returns:		void
 	Description:	Initializes all statistics and computes all other cache params
    ================================================================================== */
@@ -266,9 +266,12 @@ int ValidateInputs()
 }
 
 
- // ==========================================
-// Move to memory read/write and buffer file (???!!!!!!!!)
-// ===========================================
+/* ==================================================================================
+Function name:	ReadMemory
+Arguments:		unsigned int address
+Returns:		void
+Description:	Print the memory address read into the buffer.
+================================================================================== */
 void ReadMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
@@ -279,6 +282,12 @@ void ReadMemory(unsigned int address)
 #endif
 }
 
+/* ==================================================================================
+Function name:	WriteMemory
+Arguments:		unsigned int address
+Returns:		void
+Description:	Print the memory address written to memory.
+================================================================================== */
 void WriteMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value

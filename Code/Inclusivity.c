@@ -23,9 +23,12 @@
 
 /* ==================================================================================
 	Function name:	MessageToL2Cache
- 	Arguments:
-	Returns:
-	Description:
+ 	Arguments:		int cmd
+					unsigned int address
+					int * eviction
+					unsigned int evictedLineAddr
+	Returns:		void
+	Description:	Message function for L2 cache
    ================================================================================== */
 void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned int evictedLineAddr)
 {

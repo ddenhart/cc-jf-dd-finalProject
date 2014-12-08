@@ -24,9 +24,9 @@ Description: 	This file contains:
 
 /* ==================================================================================
 	Function name:	OutputStatistics
- 	Arguments:			void
-	Returns:				void
-	Description:			Outputs cache architecture and statistics for current trace file
+ 	Arguments:		void
+	Returns:		void
+	Description:	Outputs cache architecture and statistics for current trace file
    ================================================================================== */
 void OutputStatistics()
 {

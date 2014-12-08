@@ -26,7 +26,7 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
-#define DEBUG_LRU		1
+#define DEBUG_LRU			1
 #define DEBUG				1
 #define SILENT				1
 #define ADDR_SIZE			32		// All addresses are 32 bits
@@ -59,11 +59,10 @@ Description: 	This file contains:
 #define HIT 1
 #define HITM 2
 
-//#define ALWAYS				1  //For the two utility prototypes.
-
 // write buffer actions
 #define INSERT				0
 #define CHECK				1
+#define CLEAR				2
 
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used
