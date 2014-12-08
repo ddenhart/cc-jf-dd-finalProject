@@ -41,10 +41,10 @@ int main(int argc, char * argv[])
 	 		Argv[4] = trace file name
 	*/
 	
-	if(argc != 5)
+	if(argc != 6)
 		{
 			// TODO research changing SILENT from command line
-			fprintf(stderr, "Usage: %s	#Sets (1 to 65535)   Line size in bytes (32 to 2048, power of 2)   Associativity (4 to 32, power of 2)   Trace file name (< filename.txt >)\n", argv[0]);
+			fprintf(stderr, "Usage: %s	#Sets (1 to 65535)   Line size in bytes (32 to 2048, power of 2)   Associativity (4 to 32, power of 2)   Trace file name (< filename.txt >)  Silent Flag (0 OR 1)\n", argv[0]);
 			return 1;
 		}
 	
@@ -53,7 +53,8 @@ int main(int argc, char * argv[])
 	arg2 = atoll(argv[2]);
 	arg3 = atoll(argv[3]);
 	strcpy(filename, argv[4]);
-    
+	Silent = atoll(argv[5]);
+
     cacheStatistics.numSets = arg1;
     cacheStatistics.lineSize = arg2;
     cacheStatistics.associativity = arg3;

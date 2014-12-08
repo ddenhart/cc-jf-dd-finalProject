@@ -275,11 +275,13 @@ Description:	Print the memory address read into the buffer.
 void ReadMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
-#if SILENT
-    printf("\n------------------------------------------Read Memory---------\n");
-    printf("Memory read from Address: %#x", address);
-    printf("\n--------------------------------------------------------------\n\n");
-#endif
+
+	if (Silent)
+	{
+		printf("\n------------------------------------------Read Memory---------\n");
+		printf("Memory read from Address: %#x", address);
+		printf("\n--------------------------------------------------------------\n\n");
+	}
 }
 
 /* ==================================================================================
@@ -291,9 +293,10 @@ Description:	Print the memory address written to memory.
 void WriteMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
-#if SILENT
-    printf("\n------------------------------------------Write Memory--------\n");
-    printf("Memory write to Address: %#x", address);
-    printf("\n--------------------------------------------------------------\n\n");
-#endif
+	if (Silent)
+	{
+		printf("\n------------------------------------------Write Memory--------\n");
+		printf("Memory write to Address: %#x", address);
+		printf("\n--------------------------------------------------------------\n\n");
+	}
 }

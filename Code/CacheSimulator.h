@@ -28,7 +28,7 @@ Description: 	This file contains:
 
 #define DEBUG_LRU			1
 #define DEBUG				1
-#define SILENT				1
+
 #define ADDR_SIZE			32		// All addresses are 32 bits
 #define INPUT_BUFFER_SIZE 	100
 #define WRITE_BUFFER_SIZE	8
@@ -161,6 +161,9 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 // Memory and Write Buffer Functions
 void ReadMemory(unsigned int address);
 void WriteMemory(unsigned int address);
+
+//Silent flag
+int Silent;
 
 
 

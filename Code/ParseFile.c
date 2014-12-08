@@ -116,11 +116,13 @@ int ProgramWrapper(char * HexAddress, unsigned int operation)
 	unsigned int convertedHex = 0;
 
 	ParseHexAddress(HexAddress, &tag, &index, &convertedHex);	//Run the parser on the address
-#if SILENT
-	printf("\n\n\n------------------------------------------Trace File Line-----\n");
-	printf("Command: %d  Address: %#x", operation, convertedHex);
-	printf("\n--------------------------------------------------------------\n\n");
-#endif
+	
+	if (Silent)
+	{
+		printf("\n\n\n------------------------------------------Trace File Line-----\n");
+		printf("Command: %d  Address: %#x", operation, convertedHex);
+		printf("\n--------------------------------------------------------------\n\n");
+	}
 	return CommandCentral(tag, index, operation, convertedHex);	//Return the value that comes from the command function, check to see if it is -1 to exit the program
 }
 

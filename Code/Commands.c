@@ -196,7 +196,7 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
 			{
 				message = TRUE;
-            UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
+            	UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			}
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eMODIFIED) || (cachePtr[index].setPtr[setCount].mesifBits == eEXCLUSIVE))
 			{
@@ -242,7 +242,7 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-         UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
+         	UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			break;
 		}
 	}
@@ -317,7 +317,7 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 		{
 			foundFlag = TRUE;
 			message = TRUE;
-         UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
+         	UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			break;
 		}
 	}
