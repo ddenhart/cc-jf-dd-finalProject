@@ -36,7 +36,6 @@ void MessageToL2Cache(int cmd, unsigned int address, int * eviction, unsigned in
 		// L3 needs to send 2*L2 line size bytes to L2, along with the lines addresses
 #if SILENT
 		printf("L3 to L2: write %u bytes at address %#x\n", cacheStatistics.lineSize / 2, address);
-		printf("L3 to L2: write %u bytes at address %#x\n", cacheStatistics.lineSize / 2, address + (cacheStatistics.lineSize / 2));
 #endif
 		// If L3 evicted a line in the process of satisfying the request from L3
 		// L2 needs to invalidate the line, if present in L2 cache
