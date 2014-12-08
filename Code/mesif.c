@@ -35,8 +35,8 @@ Description: 	This file contains:
 void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsigned int line, int found)
 {
     enum mesif_err eError = eNO_ERROR;
-    enum messif_state eNext = eMAX_STATES;
-    enum messif_state eCurrent = eMAX_STATES;
+    enum Mesif_states eNext = eMAX_STATES;
+    enum Mesif_states eCurrent = eMAX_STATES;
 
     sMesifBits.address = address;
     sMesifBits.cmd = cmd;
@@ -180,8 +180,8 @@ BusOperation:	Used to simulate a bus operation and to capture the
 void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult)
 {
     enum mesif_err eError = eNO_ERROR;
-    enum messif_state eNext = eMAX_STATES;
-    enum messif_state eCurrent = eMAX_STATES;
+    enum Mesif_states eNext = eMAX_STATES;
+    enum Mesif_states eCurrent = eMAX_STATES;
 
     sMesifBits.address = Address;
 
@@ -243,7 +243,7 @@ GetSnoopResult: Used to simulate the reporting of snoop results by other caches
 @output:		enum system_bus
 
 ================================================================================== */
-unsigned int GetSnoopResult(unsigned int Address, enum messif_state eCurrent)
+unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states eCurrent)
 {
     enum mesif_err eError = eNO_ERROR;
 
@@ -858,7 +858,7 @@ enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol)
 @output:
 
 ================================================================================== */
-enum mesif_err CommandMux(enum messif_state eCurrent)
+enum mesif_err CommandMux(enum Mesif_states eCurrent)
 {
     enum mesif_err eError = eNO_ERROR;
 
@@ -1174,7 +1174,7 @@ enum mesif_err CommandMux(enum messif_state eCurrent)
 @output:
 
 ================================================================================== */
-void PrintError(enum mesif_err eError, enum messif_state eCurrent)
+void PrintError(enum mesif_err eError, enum Mesif_states eCurrent)
 {
     int index = abs(eError);
     char* strCurrent = GetStateName(eCurrent);
@@ -1204,7 +1204,7 @@ void PrintError(enum mesif_err eError, enum messif_state eCurrent)
 }
 
 
-void printState(enum messif_state eCurrent, enum messif_state eNext)
+void printState(enum Mesif_states eCurrent, enum Mesif_states eNext)
 {
 #if SILENT 
     char* strCurrent = GetStateName(eCurrent);
@@ -1238,7 +1238,7 @@ void printState(enum messif_state eCurrent, enum messif_state eNext)
 #endif
 }
 
-char *GetStateName(enum messif_state eState)
+char *GetStateName(enum Mesif_states eState)
 {
     char* str;
 

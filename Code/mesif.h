@@ -173,7 +173,7 @@ int errorCount;
 void cleanMesif();
 void InitError();
 // Used to simulate the reporting of snoop results by other caches
-unsigned int GetSnoopResult(unsigned int Address, enum messif_state eCurrent);
+unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states eCurrent);
 void PutSnoopResult(unsigned int Address, unsigned int SnoopResult);
 enum mesif_err eventCodeCheck(enum Mesif_states eCurrent, enum Mesif_states *eNext);
 //Read the line MESIF state
@@ -183,11 +183,11 @@ enum Mesif_states GetHitMiss(int found, enum Mesif_states eCurrent);
 enum mesif_err  StateSelect(int iStateRow, enum Mesif_states eCurrent, enum Mesif_states *eNext);
 enum mesif_err SetMesifState(enum Mesif_states eState);
 enum mesif_err UpdateEvents(int *iEventCode, enum eventColumn eCol);
-enum mesif_err CommandMux(enum messif_state eCurrent);
-void PrintError(enum mesif_err eError, enum messif_state eCurrent);
+enum mesif_err CommandMux(enum Mesif_states eCurrent);
+void PrintError(enum mesif_err eError, enum Mesif_states eCurrent);
 
-void printState(enum messif_state eCurrent, enum messif_state eNext);
-//char *GetStateName(enum messif_state eState);
+void printState(enum Mesif_states eCurrent, enum Mesif_states eNext);
+//char *GetStateName(enum Mesif_states eState);
 char *GetCodeName(int code);
 
 //function prototypes for each action 
