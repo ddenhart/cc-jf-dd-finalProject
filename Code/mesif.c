@@ -1034,6 +1034,7 @@ enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent)
                     break;
                 case eSHARED:
                     eError = actionS_Invalidate(sMesifBits.eFlag);
+                    eError = actionS_Forward(sMesifBits.eFlag);
                     if(eError == eNO_ERROR)
                     {
                         eError = action_DoNothing();

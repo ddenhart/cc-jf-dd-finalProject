@@ -85,9 +85,9 @@ unsigned int valid_CPU_Codes[][eCOL_MAX] = {
         {eCB_READ, eCB_HIT, eCB_MEMREAD},           //0:I->F
         {eCB_READ, eCB_NOHIT, eCB_MEMREAD},         //1:I->E
         {eCB_WRITE, eCB_DONTCARE, eCB_RFO},         //2:I->M, F->M, S->M, F->M
-        {eCB_WRITE, eCB_DONTCARE, eCB_DONTCARE},    //3:M->M, E->M
-        {eCB_READ, eCB_DONTCARE, eCB_DONTCARE},     //4:M->M, F->F, S->S, E->E
-        {eCB_WRITE, eCB_DONTCARE, eCB_INVALIDATE}   //5:F->M, S->M
+        {eCB_READ, eCB_DONTCARE, eCB_DONTCARE},     //3:M->M, F->F, S->S, E->E
+        {eCB_WRITE, eCB_DONTCARE, eCB_INVALIDATE},   //4:F->M, S->M
+        {eCB_WRITE, eCB_DONTCARE, eCB_DONTCARE}    //5:M->M, E->M
 };
 
 typedef enum CPU_Rows
@@ -95,30 +95,30 @@ typedef enum CPU_Rows
         eCROW_I_F = 0,
         eCROW_I_E = 1,
         eCROW_I_M_XF_M_XS_M_XF_M = 2,
-        eCROW_M_M_XE_M = 3,
-        eCROW_M_M_XF_F_XS_S_XE_E = 4,
-        eCROW_F_M_XS_M = 5
+        eCROW_M_M_XF_F_XS_S_XE_E = 3,
+        eCROW_F_M_XS_M = 4,
+        eCROW_M_M_XE_M = 5
 }CPU_Rows_t;
 
 unsigned int valid_SYS_Codes[][eCOL_MAX] = {
-        {eSB_DONTCARE, eSB_DONTCARE, eSB_DONTCARE}, //0:I->I
-        {eSB_RFO, eSB_DONTCARE, eSB_DONTCARE},      //1:S->I
-        {eSB_RFO, eSB_HIT, eSB_FORWARD},            //2:F->I,E->I
-        {eSB_READ, eSB_HIT, eSB_FORWARD},           //3:F->S,E->S
-        {eSB_RFO, eSB_HITM, eSB_WRITEBACK},         //4:M->I
-        {eSB_READ, eSB_HITM, eSB_WRITEBACK},        //5:M->S
-        {eSB_READ, eSB_DONTCARE, eSB_DONTCARE}      //6:S->S
+        {eSB_RFO, eSB_HIT, eSB_FORWARD},            //1:F->I,E->I
+        {eSB_RFO, eSB_HITM, eSB_WRITEBACK},         //3:M->I
+        {eSB_RFO, eSB_DONTCARE, eSB_DONTCARE},      //0:S->I
+        {eSB_READ, eSB_HIT, eSB_FORWARD},           //2:F->S,E->S
+        {eSB_READ, eSB_HITM, eSB_WRITEBACK},        //4:M->S
+        {eSB_READ, eSB_DONTCARE, eSB_DONTCARE},      //5:S->S   
+        {eSB_DONTCARE, eSB_DONTCARE, eSB_DONTCARE}  //6:I->I
 };
 
 typedef enum SYS_Rows
 {
-        eSROW_I_I = 0,
-        eSROW_S_I = 1,
-        eSROW_F_I_XE_I = 2,
+        eSROW_F_I_XE_I = 0,
+        eSROW_M_I = 1,
+        eSROW_S_I = 2,
         eSROW_F_S_XE_S = 3,
-        eSROW_M_I = 4,
-        eSROW_M_S = 5,
-        eSROW_S_S = 6
+        eSROW_M_S = 4,
+        eSROW_S_S = 5,
+        eSROW_I_I = 6
 }SYS_Rows_t;
 
 //MESIF Error codes
