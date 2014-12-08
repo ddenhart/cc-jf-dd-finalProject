@@ -176,7 +176,6 @@ unsigned int GetSnoopResult(unsigned int Address)
     unsigned int snoopResult = 0;
 
     firstHalf = firstHalf >> 6;
-    //secondHalf = secondHalf >> 4;
     modRes = firstHalf ^ secondHalf;
     snoopResult = modRes%3;
 

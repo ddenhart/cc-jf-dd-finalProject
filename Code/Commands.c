@@ -48,7 +48,9 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	unsigned int setCount = 0;
 	unsigned int baseEvict = 0;
 	unsigned int baseAddress = 0;
-	unsigned int eviction = 0;
+   unsigned int eviction = 0;
+   unsigned int SnoopResult = 0;
+   int BusOp = READ;
 
 	baseAddress = GetLineAddress(HexAddress);	//Convert the hex address to its base hex address by removing the offset
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
@@ -82,8 +84,9 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 			baseEvict = ((cachePtr[index].setPtr[cacheLine].tagBits << (ConvertToBase(index << (ConvertToBase(cacheStatistics.lineSize))))) + (index << (ConvertToBase(cacheStatistics.lineSize))));
 			writeBuffer(baseEvict, INSERT, 0);
 		}
-     	cachePtr[index].setPtr[cacheLine].tagBits = tag;
-      	UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
+      cachePtr[index].setPtr[cacheLine].tagBits = tag;
+      BusOperation(BusOp, HexAddress, &SnoopResult);
+      UpdateMesif(cmd, baseAddress, index, cacheLine, SnoopResult);  //Update the MESIF State
 		if (!bufferFlag)
 	  		ReadMemory(baseAddress);
 	}
@@ -193,7 +196,7 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
 			{
 				message = TRUE;
-             	UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+            UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			}
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eMODIFIED) || (cachePtr[index].setPtr[setCount].mesifBits == eEXCLUSIVE))
 			{
@@ -239,7 +242,7 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-			UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+         UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			break;
 		}
 	}
@@ -314,7 +317,7 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 		{
 			foundFlag = TRUE;
 			message = TRUE;
-			UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+         UpdateMesif(cmd, baseAddress, index, setCount, foundFlag);  //Update the MESIF State
 			break;
 		}
 	}

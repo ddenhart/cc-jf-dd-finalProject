@@ -73,10 +73,7 @@ void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsig
 }
 
 
-/* ===============================================================================
 
-
-================================================================================== */
 void InitMesif()
 {
     InitError();
@@ -114,10 +111,7 @@ void InitMesif()
 }
 
 
-/* ===============================================================================
 
-
-================================================================================== */
 void cleanMesif()
 {
     sMesifBits.address = 0; 
@@ -134,10 +128,7 @@ void cleanMesif()
 }
 
 
-/* ===============================================================================
 
-
-================================================================================== */
 void InitError()
 {
     errorCount = 0;
@@ -165,42 +156,6 @@ void InitError()
     sErrorTable.errMsg[9] = errRow9;
 }
 
-
-enum mesif_err_t GetHitorM(enum Mesif_states_t eCurrent)
-{
-    enum mesif_err_t eError = eNO_ERROR;
-
-    sMesifBits.sCol_done[eCOL_2] = TRUE;
-
-    if(sMesifBits.cmd != SNOOPED_WRITE)
-    {
-        switch(eCurrent)
-        {
-            case eMODIFIED:
-                eError = actionM_HITM(sMesifBits.eFlag);
-                break;
-            case eEXCLUSIVE:
-                eError = actionE_HIT(sMesifBits.eFlag);
-                break;
-            case eSHARED:
-                eError = action_DoNothing(sMesifBits.eFlag);
-                break;
-            case eINVALID:
-                eError = action_DoNothing(sMesifBits.eFlag);
-                break;
-            case eFORWARD:
-                eError = actionF_HIT(sMesifBits.eFlag);
-                break;
-            default:
-                eError = eINVALID_STATE_ERROR;
-        }
-    }
-    //else already been taken care of if write
-
-    return eError;
-}
-
-
 /* ==================================================================================
 	Function name:	GetCurrentState
  	Arguments:		unsigned int set = number of the set containing the desired line
@@ -220,14 +175,7 @@ unsigned int GetMesifState(unsigned int set, unsigned int line)
 }
 
 
-/* ===============================================================================
 
-
- 
-
- 
-
-================================================================================== */
 enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -283,6 +231,29 @@ enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent)
                     eError = eINVALID_STATE_ERROR;
             }
         }
+        else if(found == HITM)
+        {
+            switch(eCurrent)
+            {
+                case eMODIFIED:
+                    eError = actionM_HITM(sMesifBits.eFlag);
+                    break;
+                case eEXCLUSIVE:
+                    eError = actionE_HITM(sMesifBits.eFlag);
+                    break;
+                case eSHARED:
+                    eError = actionS_HITM(sMesifBits.eFlag);
+                    break;
+                case eINVALID:
+                    eError = actionI_HITM(sMesifBits.eFlag);
+                    break;
+                case eFORWARD:
+                    eError = actionF_HITM(sMesifBits.eFlag);
+                    break;
+                default:
+                    eError = eINVALID_STATE_ERROR;
+            }
+        }
         else
         {
             eError = eCBUS_ERROR;
@@ -290,7 +261,6 @@ enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent)
     }
     else if(sMesifBits.eFlag == eSBUS)
     {
-
         if(found == NOHIT)
         {
             switch(eCurrent)
@@ -387,14 +357,6 @@ enum mesif_err_t SetMesifState(enum Mesif_states_t eState)
 }
 
 
-/* ===============================================================================
-
-
- 
-
- 
-
-================================================================================== */
 enum mesif_err_t StateSelect(int iStateRow, enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -641,14 +603,7 @@ enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_
 }
 
 
-/* ===============================================================================
 
-
-
-
-
-
-================================================================================== */
 int compareCodes()
 {
     int col, row;
@@ -733,14 +688,7 @@ int compareCodes()
 }
 
 
-/* ===============================================================================
 
-
-
-
-
-
-================================================================================== */
 enum mesif_err_t UpdateEvents(int *iEventCode, enum eventColumn_t eCol)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -759,14 +707,6 @@ enum mesif_err_t UpdateEvents(int *iEventCode, enum eventColumn_t eCol)
 }
 
 
-/* ===============================================================================
-
-
-
-
-
-
-================================================================================== */
 enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -1085,14 +1025,7 @@ enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent)
 }
 
 
-/* ===============================================================================
 
-
-
-
-
-
-================================================================================== */
 void PrintError(enum mesif_err_t eError, enum Mesif_states_t eCurrent)
 {
     int index = abs(eError);
@@ -2382,8 +2315,12 @@ enum mesif_err_t actionI_HITM(enum mesif_type_t eFlag)
     int iEventCode[] = {0, 0, 0};
 
 	if(iEventCode)
-	{
-		if(eFlag == eSBUS)
+   {
+       if(eFlag == eCBUS)
+       {
+          iEventCode[eCOL_2] = eCB_HIT;
+       }
+		else if(eFlag == eSBUS)
 		{
 			iEventCode[eCOL_2] = eSB_DONTCARE;
 		}
@@ -2643,7 +2580,11 @@ enum mesif_err_t actionF_NOHIT(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
 			iEventCode[eCOL_2] = eCB_DONTCARE;
-		}
+      }
+      else if(eFlag == eSBUS)
+      {
+          iEventCode[eCOL_1] = eSB_DONTCARE;
+      }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -2707,7 +2648,11 @@ enum mesif_err_t actionF_HITM(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
           iEventCode[eCOL_2] = eCB_DONTCARE;
-		}
+      }
+      else if(eFlag == eSBUS)
+      {
+          iEventCode[eCOL_2] = eSB_DONTCARE;
+      }
 		else
 		{
 			eError = eFLAG_ERROR;
