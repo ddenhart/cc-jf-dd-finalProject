@@ -21,6 +21,7 @@
 #include <string.h>				// string handling
 #include "CacheSimulator.h" 
 #include "output.h"
+#include "parse.h"
 #include "writeBuffer.h"
 
 /* ==================================================================================
@@ -174,12 +175,15 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 {
     unsigned int SnoopResult = 0;
 	unsigned int baseAddress = 0;
+   int cmd = SNOOPED_INVALIDATE;
 	int setCount = 0;
 	int checkVictim = 0;
 	int foundFlag = FALSE;
 	int message = FALSE;
 	unsigned int eviction = 0;
+   int BusOp = INVALIDATE;
 
+   BusOperation(BusOp, HexAddress, &SnoopResult);
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
@@ -189,7 +193,7 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
 			{
 				message = TRUE;
-				BusOperation(INVALIDATE, baseAddress, &SnoopResult, index, setCount);
+             	UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			}
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eMODIFIED) || (cachePtr[index].setPtr[setCount].mesifBits == eEXCLUSIVE))
 			{
@@ -225,14 +229,17 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
 	int setCount = 0;
 	int checkVictim = 0;
 	int foundFlag = FALSE;
+    int cmd = SNOOPED_READ;
+    int BusOp = READ;
 
+    BusOperation(BusOp, HexAddress, &SnoopResult);
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-			BusOperation(READ, baseAddress, &SnoopResult, index, setCount);		//Found in cache, do bus operation.
+			UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			break;
 		}
 	}
@@ -263,8 +270,12 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
 int ExecuteCommand5(unsigned int index, unsigned int tag, unsigned int HexAddress)
 {
     unsigned int SnoopResult = 0;
+    int cmd = SNOOPED_WRITE;
+    int BusOp = WRITE;
 
-    BusOperation(WRITE, HexAddress, &SnoopResult);
+    //use forwarding
+    BusOperation(BusOp, HexAddress, &SnoopResult);
+    UpdateMesif(cmd, HexAddress, 0, 0, SnoopResult);  //Update the MESIF State
 	
 	return 0;
 }
@@ -287,20 +298,23 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 {
     unsigned int SnoopResult = 0;
 	unsigned int baseAddress = 0;
+   int cmd = SNOOPED_RWIM;
 	int setCount = 0;
 	int checkVictim = 0;
 	int foundFlag = FALSE;
 	int message = FALSE;
 	unsigned int eviction = 0;
+    int BusOp = RWIM;
 
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
+   BusOperation(BusOp, HexAddress, &SnoopResult);
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
 			message = TRUE;
-			BusOperation(RWIM, baseAddress, &SnoopResult, index, setCount);
+			UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			break;
 		}
 	}

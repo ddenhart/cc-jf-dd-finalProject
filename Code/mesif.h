@@ -173,20 +173,19 @@ struct mesif_stats fromF;
 int errorCount;
 void cleanMesif();
 void InitError();
-// Used to simulate the reporting of snoop results by other caches
-unsigned int GetSnoopResult(unsigned int Address, enum Mesif_states_t eCurrent);
-void PutSnoopResult(unsigned int Address, unsigned int SnoopResult);
 enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext);
 //Read the line MESIF state
 enum Mesif_states_t GetCurrentState();
 int compareCodes();
+enum mesif_err_t GetHitorM(enum Mesif_states_t eCurrent);
 enum Mesif_states_t GetHitMiss(int found, enum Mesif_states_t eCurrent);
 enum mesif_err_t  StateSelect(int iStateRow, enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext);
 enum mesif_err_t SetMesifState(enum Mesif_states_t eState);
 enum mesif_err_t UpdateEvents(int *iEventCode, enum eventColumn_t eCol);
 enum mesif_err_t CommandMux(enum Mesif_states_t eCurrent);
 void PrintError(enum mesif_err_t eError, enum Mesif_states_t eCurrent);
-
+void printForward(unsigned int Address);
+void printWriteback(unsigned int Address);
 void printState(enum Mesif_states_t eCurrent, enum Mesif_states_t eNext);
 //char *GetStateName(enum Mesif_states_t eState);
 char *GetCodeName(int code);

@@ -88,3 +88,168 @@ void OutputValidLines()
 	}
 } 
 
+
+/* ===============================================================================
+BusOperation:	Used to simulate a bus operation and to capture the
+snoop results of last level caches of other processors
+
+@input:			enum cpu_bus_t BusOp
+unsigned int Address
+enum system_bus_t *SnoopResult
+
+@output:		None
+
+================================================================================== */
+void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult)
+{
+    char* strbus = NULL;
+    char* strres = NULL;
+    int post = FALSE;
+
+    *SnoopResult = GetSnoopResult(Address);
+
+    if(BusOp == READ)
+    {
+        strbus = "Read";
+    }
+    else if(BusOp == WRITE)
+    {
+        strbus = "Write";
+    }
+    else if(BusOp == INVALIDATE)
+    {
+        strbus = "Invalidate";
+    }
+    else if(BusOp == RWIM)
+    {
+        strbus = "RWIM";
+    }
+    else
+    {
+        strbus = "Unknown";
+    }
+
+    PutSnoopResult(Address, *SnoopResult);
+
+    //snoopResultToString(*SnoopResult, &post, strres);
+    if(*SnoopResult == NOHIT)
+    {
+        strres = "No Hit";
+    }
+    else if(*SnoopResult == HIT)
+    {
+        strres = "Hit";
+        post = TRUE;
+    }
+    else if(*SnoopResult == HITM)
+    {
+        strres = "Hit";
+        post = TRUE;
+    }
+    else
+    {
+        strres = "Unknown";
+    }
+
+#if SILENT 
+        printf("\n------------------------------------------Bus Ops---------------------\n");
+        printf("Bus Op: %s \%d, Address: %#x, Snoop Result: %s /%d",
+               strbus, BusOp, Address, strres, *SnoopResult);
+        printf("\n-----------------------------------------------------------------------\n\n");
+#endif
+}
+
+
+/* ===============================================================================
+GetSnoopResult: Used to simulate the reporting of snoop results by other caches
+
+@input:			unsigned int Address
+
+@output:		enum system_bus_t
+
+================================================================================== */
+unsigned int GetSnoopResult(unsigned int Address)
+{
+    unsigned int firstHalf = Address & 0xFFFF;
+    unsigned int secondHalf = Address & 0x00FF;
+    unsigned int modRes = 0;
+    unsigned int snoopResult = 0;
+
+    firstHalf = firstHalf >> 6;
+    //secondHalf = secondHalf >> 4;
+    modRes = firstHalf ^ secondHalf;
+    snoopResult = modRes%3;
+
+    return snoopResult;
+}
+
+
+/* ===============================================================================
+PutSnoopResult:	Used to report the result of our snooping bus
+operations by other caches
+
+@input:			unsigned int Address
+enum system_bus_t SnoopResult
+
+@output:		None
+
+================================================================================== */
+void PutSnoopResult(unsigned int Address, unsigned int SnoopResult)
+{
+    char* strres = NULL;
+    int post = FALSE;
+
+    if(SnoopResult)
+    {
+        //snoopResultToString(SnoopResult, &post, strres);
+        if(SnoopResult == NOHIT)
+        {
+            strres = "No Hit";
+        }
+        else if(SnoopResult == HIT)
+        {
+            strres = "Hit";
+            post = TRUE;
+        }
+        else if(SnoopResult == HITM)
+        {
+            strres = "Hit";
+            post = TRUE;
+        }
+        else
+        {
+            strres = "Unknown";
+        }
+    }
+
+    if(post)
+    {
+#if SILENT 
+        printf("\n------------------------------------------Snoop Result-----------------\n");
+        printf(" Address: %#x, Snoop Result: %s /%d", Address, strres, SnoopResult);
+        printf("\n-----------------------------------------------------------------------\n\n");
+#endif 
+    }
+}
+
+void snoopResultToString(unsigned int SnoopResult, int *post, char* strres)
+{
+    if(SnoopResult == NOHIT)
+    {
+        strres = "No Hit";
+    }
+    else if(SnoopResult == HIT)
+    {
+        strres = "Hit";
+        post = TRUE;
+    }
+    else if(SnoopResult == HITM)
+    {
+        strres = "Hit";
+        post = TRUE;
+    }
+    else
+    {
+        strres = "Unknown";
+    }
+}

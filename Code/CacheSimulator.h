@@ -153,9 +153,6 @@ int UpdateLRU(unsigned int set, unsigned int line, int min, int max, int flag, i
 void InitMesif();
 void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsigned int line, int found);
 unsigned int GetMesifState(unsigned int set, unsigned int line);
-// Used to simulate a bus operation and to capture the 
-// snoop results of last level caches of other processors
-void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult);
 char *GetStateName(enum Mesif_states_t eState);
 
 // Inclusion Function

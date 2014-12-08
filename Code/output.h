@@ -16,5 +16,12 @@ Description: 	This file contains:
 	
 ================================================================================== */
 
+
 void OutputStatistics();
 void OutputValidLines();
+// Used to simulate a bus operation and to capture the 
+// snoop results of last level caches of other processors
+void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult);
+unsigned int GetSnoopResult(unsigned int Address);
+void PutSnoopResult(unsigned int Address, unsigned int SnoopResult);
+void snoopResultToString(unsigned int SnoopResult, int *post, char* strres);
