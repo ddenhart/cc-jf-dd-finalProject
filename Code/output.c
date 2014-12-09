@@ -171,14 +171,14 @@ GetSnoopResult: Used to simulate the reporting of snoop results by other caches
 ================================================================================== */
 unsigned int GetSnoopResult(unsigned int Address)
 {
-    unsigned int firstHalf = Address & 0xFFFF;
-    unsigned int secondHalf = Address & 0x00FF;
+    //unsigned int firstHalf = Address & 0xFF00;
+    //unsigned int secondHalf = Address & 0x00FF;
     unsigned int modRes = 0;
-    unsigned int snoopResult = 0;
+    unsigned int snoopResult = Address >> 30;
 
-    firstHalf = firstHalf >> 6;
-    modRes = firstHalf ^ secondHalf;
-    snoopResult = modRes%3;
+    //firstHalf = firstHalf >> 6;
+    //modRes = firstHalf ^ secondHalf;
+    //snoopResult = modRes%3;
 
     return snoopResult;
 }
@@ -218,7 +218,8 @@ void PutSnoopResult(unsigned int Address, unsigned int SnoopResult)
         }
         else
         {
-            strres = "Unknown";
+            SnoopResult == HIT;
+            //strres = "Unknown";
         }
     }
 

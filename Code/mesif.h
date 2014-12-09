@@ -36,17 +36,18 @@ Description: 	This file contains:
 // Bus operation types
 typedef enum cpu_bus { 
         eCB_READ = 10, // Bus Read
-        eCB_WRITE = eCB_READ + 1, // Bus Write
+        eCB_WRITE = eCB_READ +1, // Bus Write
 
-        eCB_NOHIT = eCB_WRITE + 1,
-        eCB_HIT = eCB_NOHIT + 1,
+        eCB_NOHIT = eCB_WRITE +1,
+        eCB_HIT = eCB_NOHIT +1,
 
-        eCB_MEMREAD = eCB_HIT + 1,
-        eCB_RFO = eCB_MEMREAD + 1,
+        eCB_MEMREAD = eCB_HIT +1,
+        eCB_RFO = eCB_MEMREAD +1,
         eCB_INVALIDATE = eCB_RFO +1, // Bus Invalidate
 
-        eCB_DONTCARE = eCB_INVALIDATE + 1,
-        eCB__MAX_EVENTS = eCB_DONTCARE + 1
+        eCB_DONTCARE = eCB_INVALIDATE +1,
+        eCB_STAY = eCB_DONTCARE +1,
+        eCB_MAX_EVENTS = eCB_STAY +1
 }cpu_bus_t;
 
 
@@ -54,16 +55,17 @@ typedef enum cpu_bus {
 typedef enum system_bus
 {
         eSB_RFO = 20,
-        eSB_READ = eSB_RFO + 1,
+        eSB_READ = eSB_RFO +1,
 	
         eSB_HIT = eSB_READ +1, // Hit
-        eSB_HITM = eSB_HIT + 1, // Hit to a modified line
+        eSB_HITM = eSB_HIT +1, // Hit to a modified line
 
-        eSB_WRITEBACK = eSB_HITM + 1,
-        eSB_FORWARD = eSB_WRITEBACK + 1,
+        eSB_WRITEBACK = eSB_HITM +1,
+        eSB_FORWARD = eSB_WRITEBACK +1,
 
-        eSB_DONTCARE = eSB_FORWARD + 1,
-        eSB_MAX_EVENTS = eSB_DONTCARE + 1
+        eSB_DONTCARE = eSB_FORWARD +1,
+        eSB_STAY =  eSB_DONTCARE +1,
+        eSB_MAX_EVENTS = eSB_STAY +1
 }system_bus_t;
 
 
@@ -101,10 +103,10 @@ typedef enum CPU_Rows
 }CPU_Rows_t;
 
 unsigned int valid_SYS_Codes[][eCOL_MAX] = {
-        {eSB_RFO, eSB_HIT, eSB_FORWARD},            //1:F->I,E->I
-        {eSB_RFO, eSB_HITM, eSB_WRITEBACK},         //3:M->I
-        {eSB_RFO, eSB_DONTCARE, eSB_DONTCARE},      //0:S->I
-        {eSB_READ, eSB_HIT, eSB_FORWARD},           //2:F->S,E->S
+        {eSB_RFO, eSB_HIT, eSB_FORWARD},            //0:F->I,E->I
+        {eSB_RFO, eSB_HITM, eSB_WRITEBACK},         //1:M->I
+        {eSB_RFO, eSB_DONTCARE, eSB_DONTCARE},      //2:S->I
+        {eSB_READ, eSB_HIT, eSB_FORWARD},           //3:F->S,E->S
         {eSB_READ, eSB_HITM, eSB_WRITEBACK},        //4:M->S
         {eSB_READ, eSB_DONTCARE, eSB_DONTCARE},      //5:S->S   
         {eSB_DONTCARE, eSB_DONTCARE, eSB_DONTCARE}  //6:I->I

@@ -24,14 +24,6 @@ Description: 	This file contains:
 #include "CacheSimulator.h"
 
 
-/* ===============================================================================
-
-
-
-
-
-
-================================================================================== */
 void UpdateMesif(unsigned int cmd, unsigned int address, unsigned int set, unsigned int line, int found)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -574,14 +566,7 @@ enum mesif_err_t StateSelect(int iStateRow, enum Mesif_states_t eCurrent, enum M
 }
 
 
-/* ===============================================================================
 
-
-
-
-
-
-================================================================================== */
 enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_t *eNext)
 {
     enum mesif_err_t eError = eNO_ERROR;
@@ -589,7 +574,11 @@ enum mesif_err_t eventCodeCheck(enum Mesif_states_t eCurrent, enum Mesif_states_
 
     iRow = compareCodes();
 
-    if(iRow >= 0)
+    if((iRow == eCB_STAY) || (iRow == eSB_STAY))
+    {
+        *eNext = eCurrent;
+    }
+    else if(iRow >= 0)
     {
         //use row and flag to get the next state
         eError = StateSelect(iRow, eCurrent, eNext);
@@ -608,6 +597,7 @@ int compareCodes()
 {
     int col, row;
     int bSame = FALSE;
+    int bStay = FALSE;
 
     if(sMesifBits.iEventCode)
     {
@@ -617,7 +607,13 @@ int compareCodes()
             {
                 for(col = 0; col < MAX_STATE_COMBO; ++col)
                 {
-                    if(sMesifBits.iEventCode[col] == valid_CPU_Codes[row][col])
+                    if(sMesifBits.iEventCode[col] == eCB_STAY)
+                    {
+                        bStay = TRUE;
+                        row = eCB_STAY;
+                        break;
+                    }
+                    else if(sMesifBits.iEventCode[col] == valid_CPU_Codes[row][col])
                     {
                         bSame = TRUE;
                     }
@@ -632,7 +628,7 @@ int compareCodes()
                     }
                 }
                 //at the end of the row, if bSame is true, the row is a match
-                if(bSame)
+                if(bSame || bStay)
                 {
                     break;
                 }
@@ -645,7 +641,13 @@ int compareCodes()
             {
                 for(col = 0; col < MAX_STATE_COMBO; ++col)
                 {
-                    if(sMesifBits.iEventCode[col] == valid_SYS_Codes[row][col])
+                    if(sMesifBits.iEventCode[col] == eSB_STAY)
+                    {
+                        bStay = TRUE;
+                        row = eSB_STAY;
+                        break;
+                    }
+                    else if(sMesifBits.iEventCode[col] == valid_SYS_Codes[row][col])
                     {
                         bSame = TRUE;
                     }
@@ -660,7 +662,7 @@ int compareCodes()
                     }
                 }
                 //at the end of the row, if bSame is true, the row is a match
-                if(bSame)
+                if(bSame || bStay)
                 {
                     break;
                 }
@@ -679,7 +681,7 @@ int compareCodes()
 
     //if all done and bSame is false, there were no matches found
     //send back an error
-    if(!bSame)
+    if(!bSame && !bStay)
     {
         row = eINVALID_COLUMN_ERROR;
     }
@@ -1243,6 +1245,10 @@ enum mesif_err_t actionM_Write(enum mesif_type_t eFlag)
 		{
           iEventCode[eCOL_1] = eCB_WRITE;
 		}
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_1] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -1314,7 +1320,7 @@ enum mesif_err_t actionM_NOHIT(enum mesif_type_t eFlag)
       }
       else if(eFlag == eSBUS)
       {
-          iEventCode[eCOL_2] = eSB_DONTCARE;
+          iEventCode[eCOL_2] = eSB_STAY;
       }
 		else
 		{
@@ -1420,7 +1426,7 @@ enum mesif_err_t actionM_Invalidate(enum mesif_type_t eFlag)
       if(eFlag == eSBUS)
       {
           eCol = eCOL_1;
-          iEventCode[eCol] = eSB_DONTCARE;
+          iEventCode[eCol] = eSB_STAY;
       }
 		else
 		{
@@ -1452,6 +1458,10 @@ enum mesif_err_t actionM_Memread(enum mesif_type_t eFlag)
         {
             iEventCode[eCOL_3] = eCB_DONTCARE;
         }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_3] = eSB_STAY;
+        }
         else
         {
             eError = eFLAG_ERROR;
@@ -1478,6 +1488,10 @@ enum mesif_err_t actionM_Writeback(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_WRITEBACK;
@@ -1546,7 +1560,11 @@ enum mesif_err_t actionE_Write(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
           iEventCode[eCOL_1] = eCB_WRITE;
-		}
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_1] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -1613,11 +1631,11 @@ enum mesif_err_t actionE_NOHIT(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
 			iEventCode[eCOL_2] = eCB_DONTCARE;
-      }
-      else if(eFlag == eSBUS)
-      {
-          iEventCode[eCOL_2] = eSB_DONTCARE;
-      }
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_2] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -1683,11 +1701,11 @@ enum mesif_err_t actionE_HITM(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
 			iEventCode[eCOL_2] = eCB_DONTCARE;
-      }
-      else if(eFlag == eSBUS)
-      {
-          iEventCode[eCOL_2] = eSB_HITM;
-      }
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_2] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -1723,7 +1741,7 @@ enum mesif_err_t actionE_Invalidate(enum mesif_type_t eFlag)
       else if(eFlag == eSBUS)
       {
           eCol = eCOL_1;
-          iEventCode[eCol] = eSB_DONTCARE;
+          iEventCode[eCol] = eSB_STAY;
       }
 		else
 		{
@@ -1751,6 +1769,10 @@ enum mesif_err_t actionE_Forward(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_FORWARD;
@@ -1785,6 +1807,10 @@ enum mesif_err_t actionE_Memread(enum mesif_type_t eFlag)
         if(eFlag == eCBUS)
         {
             iEventCode[eCOL_3] = eCB_DONTCARE;
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_3] = eSB_STAY;
         }
         else
         {
@@ -1849,6 +1875,10 @@ enum mesif_err_t actionS_Write(enum mesif_type_t eFlag)
         if(eFlag == eCBUS)
         {
             iEventCode[eCOL_1] = eCB_WRITE;
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_1] = eSB_STAY;
         }
         else
         {
@@ -2023,7 +2053,7 @@ enum mesif_err_t actionS_Invalidate(enum mesif_type_t eFlag)
       else if(eFlag == eSBUS)
       {
           eCol = eCOL_1;
-          iEventCode[eCol] = eSB_DONTCARE;
+          iEventCode[eCol] = eSB_RFO;
       }
 		else
 		{
@@ -2051,6 +2081,10 @@ enum mesif_err_t actionS_Forward(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_DONTCARE;
@@ -2086,6 +2120,10 @@ enum mesif_err_t actionS_Memread(enum mesif_type_t eFlag)
         {
             iEventCode[eCOL_3] = eCB_DONTCARE;
         }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_3] = eSB_STAY;
+        }
         else
         {
             eError = eFLAG_ERROR;
@@ -2112,6 +2150,10 @@ enum mesif_err_t actionS_Writeback(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_DONTCARE;
@@ -2318,7 +2360,7 @@ enum mesif_err_t actionI_HITM(enum mesif_type_t eFlag)
    {
        if(eFlag == eCBUS)
        {
-          iEventCode[eCOL_2] = eCB_HIT;
+          iEventCode[eCOL_2] = eCB_STAY;
        }
 		else if(eFlag == eSBUS)
 		{
@@ -2353,7 +2395,11 @@ enum mesif_err_t actionI_Memread(enum mesif_type_t eFlag)
 		if(eFlag == eCBUS)
 		{
           iEventCode[eCOL_3] = eCB_MEMREAD;
-		}
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_3] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -2377,11 +2423,18 @@ enum mesif_err_t actionI_Invalidate(enum mesif_type_t eFlag)
 {
     enum mesif_err_t eError = eNO_ERROR;
     int iEventCode[] = {0, 0, 0};
+    int icol;
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            icol = eCOL_3;
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
+            icol = eCOL_1;
             iEventCode[eCOL_1] = eSB_DONTCARE;
         }
         else
@@ -2396,7 +2449,7 @@ enum mesif_err_t actionI_Invalidate(enum mesif_type_t eFlag)
 
     if(eError == eNO_ERROR)
     {
-        UpdateEvents(iEventCode, eCOL_1);
+        UpdateEvents(iEventCode, icol);
     }
 
     return eError;
@@ -2410,6 +2463,10 @@ enum mesif_err_t actionI_Forward(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_DONTCARE;
@@ -2441,7 +2498,11 @@ enum mesif_err_t actionI_Writeback(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
-        if(eFlag == eSBUS)
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
+        else if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_DONTCARE;
             printWriteback(sMesifBits.address);
@@ -2511,7 +2572,11 @@ enum mesif_err_t actionF_Write(enum mesif_type_t eFlag)
 		if (eFlag == eCBUS)
 		{
           iEventCode[eCOL_1] = eCB_WRITE;
-		}
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_1] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -2577,14 +2642,14 @@ enum mesif_err_t actionF_NOHIT(enum mesif_type_t eFlag)
 
 	if (iEventCode)
 	{
-		if (eFlag == eCBUS)
-		{
+        if (eFlag == eCBUS)
+        {
 			iEventCode[eCOL_2] = eCB_DONTCARE;
-      }
-      else if(eFlag == eSBUS)
-      {
-          iEventCode[eCOL_1] = eSB_DONTCARE;
-      }
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_2] = eSB_STAY;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -2651,7 +2716,7 @@ enum mesif_err_t actionF_HITM(enum mesif_type_t eFlag)
       }
       else if(eFlag == eSBUS)
       {
-          iEventCode[eCOL_2] = eSB_DONTCARE;
+          iEventCode[eCOL_2] = eSB_STAY;
       }
 		else
 		{
@@ -2684,12 +2749,12 @@ enum mesif_err_t actionF_Invalidate(enum mesif_type_t eFlag)
 		{
           eCol = eCOL_3;
           iEventCode[eCol] = eCB_INVALIDATE;
-      }
-      else if(eFlag == eSBUS)
-      {
-          eCol = eCOL_1;
-          iEventCode[eCol] = eSB_DONTCARE;
-      }
+        }
+        else if(eFlag == eSBUS)
+        {
+            eCol = eCOL_1;
+            iEventCode[eCol] = eSB_RFO;
+        }
 		else
 		{
 			eError = eFLAG_ERROR;
@@ -2716,6 +2781,10 @@ enum mesif_err_t actionF_Forward(enum mesif_type_t eFlag)
 
     if(iEventCode)
     {
+        if(eFlag == eCBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
+        }
         if(eFlag == eSBUS)
         {
             iEventCode[eCOL_3] = eSB_FORWARD; 
@@ -2750,6 +2819,10 @@ enum mesif_err_t actionF_Memread(enum mesif_type_t eFlag)
         if(eFlag == eCBUS)
         {
             iEventCode[eCOL_3] = eCB_DONTCARE;
+        }
+        else if(eFlag == eSBUS)
+        {
+            iEventCode[eCOL_3] = eCB_STAY;
         }
         else
         {
