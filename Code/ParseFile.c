@@ -57,32 +57,38 @@ int ParseFile(char * Filename)
 			lineHolder[counter] = '\0';
 			if ((isSpace == 0) && (counter > 0))	//If the counter is greater than zero, but there has not been a space, then at the end of the line at the end of the file.
 			{
-				writeBuffer(0, CLEAR, 0);	//Clear the buffer by writing out to the memory
+				writeBuffer(NOACTION, CLEAR, NOACTION);	//Clear the buffer by writing out to the memory
 				break;
 			}
 			else
 			{
 				int returnValue = ProgramWrapper(lineHolder, operation);	//Run the last line through the program
 				if (returnValue < 0)
-					return -1;
+					return FAILURE;
 			}
-			writeBuffer(0, CLEAR, 0);	//Clear the buffer by writing out to the memory
+			writeBuffer(NOACTION, CLEAR, NOACTION);	//Clear the buffer by writing out to the memory
 			break;
 		}
 		if (characterInLine == '\n')		//If new line character
 		{
 			++victimCounter;				//counter for the buffer as lines are read
-			if (victimCounter > 3)
+			if (victimCounter > BUFFER_TIMER)
 			{
-				victimReturn = writeBuffer(0, 0, victimCounter);  //Write to memory the next address in the write buffer
-				if (victimReturn == -1)
-					return -1;
+#if DEBUGBUFFER
+				printf("\n------------------------------------------Write Buffer eviction because of Timer------------------\n");
+#endif
+				victimReturn = writeBuffer(NOACTION, NOACTION, victimCounter);  //Write to memory the next address in the write buffer
+#if DEBUGBUFFER
+				printf("\n------------------------------------------End Write Buffer Timer Eviction-------------------------\n\n");
+#endif
+				if (victimReturn == FAILURE)
+					return FAILURE;
 				victimCounter = 0;
 			}
 			lineHolder[counter] = '\0';
 			int returnValue = ProgramWrapper(lineHolder, operation);  //Run the program on the line that was created from the file
 			if (returnValue < 0)
-				return -1;
+				return FAILURE;
 			isSpace = 0;					//Reset is space variable.
 			continue;
 		}
@@ -117,7 +123,7 @@ int ProgramWrapper(char * HexAddress, unsigned int operation)
 
 	ParseHexAddress(HexAddress, &tag, &index, &convertedHex);	//Run the parser on the address
 	
-	if (Silent)
+	if (!Silent)
 	{
 		printf("\n\n\n------------------------------------------Trace File Line-----\n");
 		printf("Command: %d  Address: %#x", operation, convertedHex);

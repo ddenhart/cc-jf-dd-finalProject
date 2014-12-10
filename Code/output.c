@@ -151,7 +151,7 @@ void BusOperation(int BusOp, unsigned int Address, unsigned int  *SnoopResult)
         strres = "Unknown";
     }
 
-	if (Silent)
+	if (!Silent)
 	{
         printf("\n------------------------------------------Bus Ops---------------------\n");
         printf("Bus Op: %s \%d, Address: %#x, Snoop Result: %s /%d",
@@ -225,7 +225,7 @@ void PutSnoopResult(unsigned int Address, unsigned int SnoopResult)
 
     if(post)
     {
-		if (Silent)
+		if (!Silent)
 		{
 			printf("\n------------------------------------------Snoop Result-----------------\n");
 			printf(" Address: %#x, Snoop Result: %s /%d", Address, strres, SnoopResult);

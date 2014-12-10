@@ -276,7 +276,7 @@ void ReadMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
 
-	if (Silent)
+	if (!Silent)
 	{
 		printf("\n------------------------------------------Read Memory---------\n");
 		printf("Memory read from Address: %#x", address);
@@ -293,7 +293,7 @@ Description:	Print the memory address written to memory.
 void WriteMemory(unsigned int address)
 {
 	// TODO Call GetLineAddress() before sending the address; new address is return value
-	if (Silent)
+	if (!Silent)
 	{
 		printf("\n------------------------------------------Write Memory--------\n");
 		printf("Memory write to Address: %#x", address);

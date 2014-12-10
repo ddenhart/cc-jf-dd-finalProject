@@ -26,8 +26,9 @@ Description: 	This file contains:
 #define TRUE 1
 #define FALSE 0
 
-#define DEBUG_LRU			1
-#define DEBUG				1
+//#define DEBUG_LRU			1
+//#define DEBUG				1
+#define DEBUGBUFFER			1
 
 #define ADDR_SIZE			32		// All addresses are 32 bits
 #define INPUT_BUFFER_SIZE 	100
@@ -60,9 +61,20 @@ Description: 	This file contains:
 #define HITM 2
 
 // write buffer actions
+#define NOACTION			-1
 #define INSERT				0
 #define CHECK				1
 #define CLEAR				2
+#define FAILURE				-1
+#define CRITICAL_FAILURE	-3
+#define WRITE_TO_MEMORY		0
+
+//write buffer inner actions
+#define EMPTY				-1
+#define MIN_TRIGGER_STATE	2
+
+//write buffer eviction timer
+#define BUFFER_TIMER 3
 
 //MESIF states
 //Invalid was chosen to be first in the enum list so that it could be also used

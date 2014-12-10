@@ -68,14 +68,14 @@ int ExecuteCommands02(unsigned int index, unsigned int tag, unsigned int HexAddr
 	}
 	cacheLine = UpdateLRU(index, cacheLine, min, max, flag, &eviction);
 	if (cacheLine < 0)
-		return -1;
+		return FAILURE;
 	else if (flag == CACHE_MISS)
 	{
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;  //Update the miss statistics
 		++cacheStatistics.numReads;
-		checkVictim = writeBuffer(baseAddress, CHECK, -1);  //Check the write buffer for the base address of the sought address
-		if (checkVictim > -1)
+		checkVictim = writeBuffer(baseAddress, CHECK, NOACTION);  //Check the write buffer for the base address of the sought address
+		if (checkVictim > FAILURE)
 			bufferFlag = TRUE;
 		else if (checkVictim == -3)
 			return -1;
@@ -137,21 +137,22 @@ int ExecuteCommand1(unsigned int index, unsigned int tag, unsigned int HexAddres
 	}
 	cacheLine = UpdateLRU(index, cacheLine, min, max, flag, &eviction);
 	if (cacheLine < 0)
-		return -1;
+		return FAILURE;
 	else if (flag == CACHE_MISS)
 	{
 		++cacheStatistics.numMisses;
 		++cacheStatistics.numAccesses;			//Increment statistics
 		++cacheStatistics.numWrites;
-		checkVictim = writeBuffer(baseAddress, CHECK, -1);	//Check the write buffer for the base hexaddress
-		if (checkVictim > -1)
+		checkVictim = writeBuffer(baseAddress, CHECK, NOACTION);	//Check the write buffer for the base hexaddress
+		if (checkVictim == CRITICAL_FAILURE)
+			return FAILURE;						//Return that there was an error in the buffer
+		else if (checkVictim > FAILURE)
 			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
-		else if (checkVictim == -3)
-			return -1;							//Return that there was an error in the buffer
+
 		if ((cachePtr[index].setPtr[cacheLine].mesifBits == eMODIFIED) && (eviction == TRUE))
 		{
 			baseEvict = ((cachePtr[index].setPtr[cacheLine].tagBits << (ConvertToBase(index << (ConvertToBase(cacheStatistics.lineSize))))) + (index << (ConvertToBase(cacheStatistics.lineSize))));  //Terrible line to get the base address.
-			writeBuffer(baseEvict, INSERT, 0); //Write the base address of the evicted line to buffer.  Offset bits do not matter, and we read a whole line anyways.
+			writeBuffer(baseEvict, INSERT, NOACTION); //Write the base address of the evicted line to buffer.  Offset bits do not matter, and we read a whole line anyways.
 		}
       	cachePtr[index].setPtr[cacheLine].tagBits = tag;
 		UpdateMesif(cmd, baseAddress, index, cacheLine, CACHE_MISS);  //Update the MESIF State
@@ -178,15 +179,15 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 {
     unsigned int SnoopResult = 0;
 	unsigned int baseAddress = 0;
-   int cmd = SNOOPED_INVALIDATE;
+    int cmd = SNOOPED_INVALIDATE;
 	int setCount = 0;
 	int checkVictim = 0;
 	int foundFlag = FALSE;
 	int message = FALSE;
 	unsigned int eviction = 0;
-   int BusOp = INVALIDATE;
+    int BusOp = INVALIDATE;
 
-   BusOperation(BusOp, HexAddress, &SnoopResult);
+    BusOperation(BusOp, HexAddress, &SnoopResult);
 	baseAddress = GetLineAddress(HexAddress);	//Get the base address of the HexAddress
 	for (setCount = 0; setCount < cacheStatistics.associativity; ++setCount)
 	{
@@ -196,10 +197,11 @@ int ExecuteCommand3(unsigned int index, unsigned int tag, unsigned int HexAddres
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eFORWARD) || (cachePtr[index].setPtr[setCount].mesifBits == eSHARED))
 			{
 				message = TRUE;
-            UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+            	UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			}
 			if ((cachePtr[index].setPtr[setCount].mesifBits == eMODIFIED) || (cachePtr[index].setPtr[setCount].mesifBits == eEXCLUSIVE))
 			{
+				cachePtr[index].setPtr[setCount].mesifBits = eINVALID;
 				printf("\nThis state change is not ever possible.  Running the next command from the parse file.\n");
 				return 0;
 			}
@@ -242,20 +244,20 @@ int ExecuteCommand4(unsigned int index, unsigned int tag, unsigned int HexAddres
 		if ((cachePtr[index].setPtr[setCount].mesifBits != eINVALID) && (tag == cachePtr[index].setPtr[setCount].tagBits))
 		{
 			foundFlag = TRUE;
-         UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+      	    UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			break;
 		}
 	}
 	if (!foundFlag)
 	{
-		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address, if found, write it to memory.
-		if (checkVictim > -1)
+		checkVictim = writeBuffer(baseAddress, CHECK, WRITE_TO_MEMORY);  //Check the write buffer for the base address of the sought address, if found, write it to memory.
+		if (checkVictim == CRITICAL_FAILURE)
+			return FAILURE;						//Return that there was an error in the buffer
+		else if (checkVictim > FAILURE)
 		{
 			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
 			foundFlag = TRUE;
-		}
-		else if (checkVictim == -3)
-			return -1;							//Return that there was an error in the buffer
+		}					
 	}
 	return 0;
 }
@@ -317,21 +319,21 @@ int ExecuteCommand6(unsigned int index, unsigned int tag, unsigned int HexAddres
 		{
 			foundFlag = TRUE;
 			message = TRUE;
-         UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
+         	UpdateMesif(cmd, baseAddress, index, setCount, SnoopResult);  //Update the MESIF State
 			break;
 		}
 	}
 	if (!foundFlag)
 	{
-		checkVictim = writeBuffer(baseAddress, CHECK, 0);  //Check the write buffer for the base address of the sought address
-		if (checkVictim > -1)
+		checkVictim = writeBuffer(baseAddress, CHECK, WRITE_TO_MEMORY);  //Check the write buffer for the base address of the sought address
+		if (checkVictim == CRITICAL_FAILURE)
+			return -1;							//Return that there was an error in the buffer
+		else if (checkVictim > FAILURE)
 		{
 			baseAddress = checkVictim;			//Putting the address from the write buffer into the HexAddress
 			eviction = TRUE;
 			foundFlag = TRUE;
 		}
-		else if (checkVictim == -3)
-			return -1;							//Return that there was an error in the buffer
 	}
 
 	if (message)
